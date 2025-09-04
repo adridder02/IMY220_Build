@@ -31,6 +31,6 @@ app.get("/*", (req, res) => {
 });
 
 // PORT TO LISTEN TO
-app.listen(1337, () => {
+app.listen(8080, () => {
   console.log("Listening on localhost:1337");
 });

@@ -24,3 +24,7 @@ npm start
 // run in a separate terminal for auto-rebundling on changes
 npx webpack -w
 
+// Docker
+
+docker build -t u23542676 .
+docker run --name express -p 3005:8080 u23542676
