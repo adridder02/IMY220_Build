@@ -17,9 +17,6 @@ const ProjectsPage = () => {
 
     return (
         <>
-            <link rel="stylesheet" href="css/main.css" />
-            <link rel="stylesheet" href="css/forms.css" />
-            <link rel="stylesheet" href="css/projects.css" />
             {showPopup ? (<CreateProject onClose={handleClosePopup} />
             ) : (
                 <div className="projects">
