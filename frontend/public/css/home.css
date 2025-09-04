@@ -1,0 +1,167 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/ClientSide/css.css to edit this template
+*/
+/* 
+    Created on : Sep 1, 2025, 8:59:38 AM
+    Author     : ane
+*/
+
+body#dash header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 80vw;
+    min-height: 30vw;
+    margin: 5vw auto;
+    margin-bottom: 9vw;
+  
+}
+
+body#dash header div {
+
+    color: var(--primary);
+
+}
+
+body#dash header div:nth-of-type(2) {
+    font-size: 3rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+
+}
+
+body#dash header div:nth-of-type(2) h1 {
+    margin: 0;
+}
+
+
+body#dash header img {
+    width: 35vw;
+}
+
+body#dash header div.vLine {
+    border-width: 4px;
+}
+
+/*Grid*/
+.grid-container {
+    display: grid;
+    grid-template-areas:
+        "heading heading"
+        "buttons buttons"
+        "filter activity";
+
+    grid-template-columns: 1fr 3fr;
+    grid-template-rows: auto 4fr;
+    column-gap: 2vw;
+    align-content: center;
+    padding: 0 4vw 5vw 5vw;
+}
+
+.heading1 {
+    grid-area: heading;
+}
+
+.buttons {
+    grid-area: buttons;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+}
+
+
+/*Filter*/
+.filter {
+    grid-area: filter;
+    background-color: red;
+    border-radius: 30px;
+    background-color: var(--primary);
+    color: black;
+    padding: 1.5vw;
+    width: 20vw;
+    margin-right: 2vw;
+    display: flex;
+    flex-direction: column;
+    height: max-content;
+    display: flex;
+    flex-direction: column;
+    gap: 1vw;
+    top: 2vw;
+    position: sticky;
+}
+
+
+.filterProject {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    margin: 3%;
+
+}
+
+.filterProject h3 {
+    font-size: 2rem;
+    border-bottom: 3px solid var(--secondary);
+    line-height: 2.5vw;
+    width: 55%;
+    font-family: Headings;
+    margin: 0 auto;
+    margin-bottom: 3%;
+    padding-bottom: 3%;
+}
+
+.filterProject button {
+    margin: 2% 2%;
+    border-radius: 30px;
+    padding: 3% 0;
+}
+
+.filterProject button.selected {
+    background-color: var(--secondary);
+    border-color: var(--primary);
+}
+
+.filterProject button:hover {
+    cursor: pointer;
+    background-color: var(--accent);
+    color: var(--primary);
+}
+
+/*Search Bar*/
+
+#filterSearch {
+    display: flex;
+    flex-direction: column;
+    border-radius: 40px;
+    margin: 0 auto;
+    margin-top: 1vw;
+    border-radius: 30px;
+    background-color: var(--secondary);
+    border: 3px solid var(--primary);
+    min-height: 3.5vw;
+    width: 90%;
+    padding-left: 2vw;
+
+}
+
+#filterSearch input::placeholder {
+    color: var(--primary) !important;
+}
+
+#filterSearch input {
+    all: unset;
+    width: 100%;
+    flex: 4;
+    color: var(--primary) !important;
+    font-size: 16px;
+
+}
+
+/* Buttons */
+
+.grid-container div.buttons {
+    padding: 2vw;
+}

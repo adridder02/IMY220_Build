@@ -1,0 +1,391 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/ClientSide/css.css to edit this template
+*/
+/* 
+    Created on : Sep 2, 2025, 11:12:31 AM
+    Author     : ane
+*/
+
+/*Buttons*/
+button {
+    border-radius: 15px;
+    padding: 1% 2%;
+    background-color: var(--primary);
+    color: var(--secondary);
+    border: 2px solid var(--secondary);
+    font-size: 1.2rem;
+    transition: 0.5s;
+    text-align: center;
+    font-family: Headings;
+    margin-right: 1%;
+
+}
+
+button.selected {
+    background-color: var(--accent);
+    color: var(--primary);
+
+}
+
+button:hover {
+    cursor: pointer;
+    background-color: var(--secondary);
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+/*Sort*/
+
+div.sort select {
+    -webkit-appearance: none;
+    appearance: none;
+    border-radius: 30px;
+    background-color: var(--primary);
+    font-size: 18px;
+    border-width: 2px;
+    border-color: var(--secondary);
+    transition: 0.5s;
+    margin: 0 auto;
+    width: 100%;
+    text-align: center;
+    font-size: 1.1rem;
+    padding: 0.8vw 0;
+}
+
+div.sort .select-wrapper {
+    position: relative;
+}
+
+div.sort .select-wrapper::after {
+    content: "\25BC";
+    top: 1vw;
+    right: 3%;
+    position: absolute;
+    padding-right: 1vw;
+    padding-left: 0.5vw;
+    transition: 0.5s;
+    font-size: 18px;
+}
+
+div.sort select:hover,
+.select-wrapper:hover {
+    color: var(--accent);
+    cursor: pointer;
+    border-color: var(--accent);
+}
+
+/*Activity*/
+.activity {
+    grid-area: activity;
+    background-color: var(--primary);
+    width: 90%;
+    margin-top: 0.5%;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    margin-left: 0.7%;
+    border-radius: 30px;
+    padding: 3vw;
+    margin: 0 auto;
+    gap: 1vw;
+}
+
+img.avatar {
+    width: 5.5vw;
+    height: 5.5vw;
+    border-radius: 50px;
+    border: 2px solid var(--secondary);
+}
+
+.ActivityType1 {
+    display: flex;
+    flex-direction: row;
+    font-size: 1.5rem;
+    border-bottom: 2px solid black;
+    padding-bottom: 1.5%;
+}
+
+.title {
+    display: flex;
+    flex-direction: row;
+    gap: 6px;
+    padding-top: 1.2vw;
+    padding-bottom: 1.5%;
+
+}
+
+.text {
+    margin-left: 2vw;
+}
+
+.title p:nth-of-type(1),
+.text p:nth-of-type(3) {
+    color: var(--accent);
+}
+
+p {
+    margin: 0
+}
+
+.ActivityType2 .ActivityType1,
+.ActivityType3 .ActivityType1,
+.ActivityType2:last-of-type,
+.ActivityType1:last-of-type,
+.ActivityType3:last-of-type {
+    border: none;
+}
+
+.ActivityType3 .info {
+    width: 60%;
+    padding: 1vw;
+    padding-top: 0;
+    margin-left: auto;
+    margin-right: 25%;
+
+}
+
+.ActivityType2, .ActivityType3 {
+    display: flex;
+    flex-direction: row;
+    font-size: 1.1rem;
+    border-bottom: 2px solid black;
+    padding-bottom: 1.5%;
+
+}
+
+.left {
+    flex: 3;
+}
+
+.right {
+    flex: 1;
+
+    margin-left: 1vw;
+}
+
+.info {
+    width: 80%;
+    padding: 1vw;
+    padding-top: 0;
+    margin-left: auto;
+}
+
+.info .hLine {
+    margin-bottom: 1.7vw;
+}
+
+.cardMini {
+    border-radius: 30px;
+    background-color: var(--primary);
+    padding: 1.2vw;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1vw;
+    text-align: center;
+    padding-bottom: 1.7vw;
+    border: 2px solid var(--secondary);
+
+}
+
+.cardMini h3 {
+    margin: 0;
+    color: var(--accent);
+}
+
+.cardMini p {
+    font-size: 0.9rem;
+}
+
+.cardMini img {
+    width: 100%;
+    margin: 0 auto;
+    border-radius: 20px;
+    border: 2px solid var(--secondary);
+
+}
+
+.cardMini .hLine {
+    border-width: 2px;
+}
+
+
+/*Projects*/
+
+.projectsBar {
+    display: flex;
+    flex-direction: row;
+    width: 90%;
+    margin: 3vw auto;
+}
+
+.projectButtons {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+}
+
+.projectButtons button {
+    border-radius: 30px;
+    padding: 1% 3vw;
+}
+
+.projectsBar div.sort select {
+    font-size: 20px;
+    font-family: Headings;
+    width: 20vw;
+}
+
+.projectButtons button:first-of-type {
+    background-color: var(--accent);
+    color: var(--primary);
+
+}
+
+.projectButtons button.selected {
+    background-color: var(--secondary);
+    color: var(--primary);
+    border-color: var(--primary);
+}
+
+.projectButtons button:nth-of-type(2):hover,
+.projectButtons button:nth-of-type(3):hover {
+    color: var(--accent);
+    border-color: var(--accent);
+}
+
+
+/*Cards*/
+
+.cards {
+    all: unset;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    width: 90%;
+    font-size: 1rem;
+    gap: 1vw;
+    padding-bottom: 3vw;
+}
+
+.cards div.card {
+    background-color: var(--primary);
+    text-align: center;
+    border-radius: 30px;
+    padding: 1.5vw 2vw 1.5vw 2vw;
+    width: 19%;
+    height: max-content;
+    margin-bottom: 1%;
+
+}
+
+.cards div.tags {
+    border-top: 1.5px solid var(--secondary);
+    padding: 5%;
+    word-spacing: 1vw;
+
+}
+
+.cards h3 {
+    color: var(--accent);
+    font-family: Headings;
+    font-size: 2rem;
+}
+
+.cards p {
+    width: 85%;
+    margin: 0 auto;
+    border-top: 1.5px solid var(--secondary);
+    padding: 5%;
+}
+
+.cards p:last-of-type {
+    border-bottom: 1.5px solid var(--secondary);
+    margin-bottom: 1.5vw;
+
+}
+
+.cards img {
+    width: 100%;
+}
+
+/*Project Images*/
+.projectImg {
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-color: white;
+    height: 10vw;
+    width: 100%;
+    border-width: 1px;
+    border-radius: 30px;
+    border: 2px solid var(--secondary);
+    margin-top: 0.7vw;
+}
+
+.imgLink {
+    background-image: url("../assets/img/placeholder.png");
+}
+
+
+/* Card Buttons */
+.cards button {
+    border-radius: 30px;
+    padding: 4%;
+    background-color: var(--primary);
+    color: var(--secondary);
+    margin-bottom: 4%;
+    border-width: 2px;
+    padding-left: 1.5vw;
+    border: 2px solid var(--secondary);
+    width: 90%;
+    font-size: 1.2rem;
+    transition: 0.5s;
+}
+
+.cards button:hover {
+    cursor: pointer;
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.cards button:last-of-type {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.cards button:last-of-type:hover {
+    border-color: var(--secondary);
+    color: var(--primary);
+    background-color: var(--accent);
+}
+
+/*Icon on Image*/
+
+.imgAddon {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    width: 100%;
+    margin: 0 auto;
+}
+
+.cards button.info {
+    all: unset;
+    font-size: 1.5rem;
+    width: 2vw;
+    height: 2vw;
+    text-align: center;
+    border: 2px solid var(--secondary);
+    border-radius: 30px;
+    color: var(--secondary);
+    background-color: var(--primary);
+    padding: 0;
+    transition: 0.5s;
+    margin-top: 1vw;
+    margin-right: 1vw;
+
+}

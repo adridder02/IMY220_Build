@@ -1,0 +1,529 @@
+/* 
+    Created on : Aug 18, 2025, 1:52:11 PM
+    Author     : ane
+*/
+
+/*Form Header*/
+.formHeader {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    border-radius: 30px 40px 0 0;
+    padding-left: 7%;
+}
+
+.close {
+    background-color: var(--tertiary);
+    width: 10%;
+    text-align: center;
+    border-radius: 0 30px 0 0;
+    font-size: 2rem;
+    padding: 2vw 0.5vw;
+    height: max-content;
+    color: var(--primary);
+    transition: 0.5s;
+}
+
+.close:hover {
+    background-color: var(--accent);
+    cursor: pointer;
+}
+
+.formHeader h2 {
+    padding-top: 2vw;
+}
+
+.timestamp {
+    margin-left: auto;
+    padding-right: 4vw;
+    color: gray;
+}
+
+/*Form*/
+form input,
+form textarea {
+    all: unset;
+    color: var(--text);
+}
+
+.form {
+    background-color: var(--primary);
+    color: var(--secondary);
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    width: 60%;
+    border-radius: 30px 40px 30px 30px;
+    top: 0;
+    gap: 2%;
+    flex-wrap: wrap;
+
+}
+
+#logreg-container form {
+    display: flex;
+    flex-direction: column;
+    row-gap: 1vw;
+    width: 80%;
+    padding: 3vw 0;
+    padding-bottom: 1vw;
+    margin: 0 auto;
+
+}
+
+#logreg-container form button {
+    border-radius: 30px;
+    padding: 4%;
+    background-color: var(--accent);
+    color: var(--primary);
+    margin-bottom: 2%;
+    border-width: 2px;
+    font-size: 24px;
+    padding-left: 1.5vw;
+    width: 100%;
+    transition: 0.5s;
+}
+
+#logreg-container form button:hover {
+    cursor: pointer;
+    background-color: var(--secondary);
+
+}
+
+.formContent {
+    display: flex;
+    flex-direction: row;
+    column-gap: 2vw;
+    width: 80%;
+    padding: 1vw;
+    margin: 0 auto;
+}
+
+.leftCol {
+    display: flex;
+    flex-direction: column;
+    flex: 2;
+    gap: 1vw;
+}
+
+.rightCol {
+    display: flex;
+    flex-direction: column;
+    flex: 1.5;
+    gap: 1vw;
+}
+
+
+form div.header h2 {
+    width: 30%;
+}
+
+form div {
+    display: flex;
+    flex-direction: column;
+    line-height: 3vw;
+    font-size: 24px;
+
+}
+
+form label {
+    margin-left: 1.5vw;
+    margin-bottom: 0.5vw;
+}
+
+form input,
+form textarea {
+    border-radius: 20px;
+    padding: 1%;
+    background-color: var(--primary);
+    border: 2px solid;
+    font-size: 18px;
+    padding-left: 1.5vw;
+}
+
+form textarea {
+    min-height: 15vw;
+}
+
+/*Upload Image*/
+
+.uploadArea {
+    width: 80%;
+    min-height: 18vw;
+    text-align: center;
+    margin: 2vw auto;
+    margin-bottom: 1vw;
+    background-color: lightgrey;
+    border: 2px solid var(--secondary);
+    border-radius: 30px;
+}
+
+.uploadArea p {
+    padding-top: 15%;
+    font-family: Headings;
+    font-size: 1.2rem;
+}
+
+
+/* Form Dropdown */
+select {
+    -webkit-appearance: none;
+    appearance: none;
+    border-radius: 20px;
+    padding: 5%;
+    background-color: var(--primary);
+    font-size: 18px;
+    border-width: 2px;
+    border-color: var(--secondary);
+    transition: 0.5s;
+    margin-bottom: 2%;
+    padding-left: 1.5vw;
+    font-family: General;
+
+}
+
+.select-wrapper {
+    position: relative;
+}
+
+.select-wrapper::after {
+    content: "\25BC";
+    top: 10%;
+    right: 3%;
+    position: absolute;
+    padding-right: 1vw;
+    padding-left: 0.5vw;
+    transition: 0.5s;
+    font-size: 18px;
+}
+
+select:hover,
+.select-wrapper:hover {
+    color: var(--accent);
+    cursor: pointer;
+    border-color: var(--accent);
+}
+
+div.button-container {
+    border-top: 2px solid var(--secondary);
+    padding-top: 8%;
+    margin-top: 4%;
+
+}
+
+div.popup {
+    margin: 4vw 0;
+}
+
+/*Tag*/
+form .tags,
+.addFiles,
+.members {
+    display: flex;
+    flex-direction: column;
+    border: 2px solid var(--secondary);
+    border-radius: 20px;
+}
+
+.tagInput input,
+.addFiles input,
+.memberInput input {
+    border: none;
+}
+
+.tagInput,
+.memberInput {
+    display: flex;
+    flex-direction: row;
+    border: 2px solid var(--secondary);
+    border-radius: 20px;
+    justify-content: space-between;
+    width: 80%;
+    margin: 2vw auto;
+}
+
+.tagInput button,
+.fileInput button,
+.memberInput button {
+    all: unset;
+    width: 20%;
+    border: 2px solid var(--secondary);
+    border-radius: 15px;
+    text-align: center;
+    margin: 1%;
+    transition: 0.5s;
+}
+
+.tagInput button:hover,
+.fileInput button:hover,
+.memberInput button:hover {
+    cursor: pointer;
+    background-color: var(--accent);
+    color: var(--primary);
+}
+
+.tagList {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+    min-height: 10vw;
+    border-top: 2px solid var(--secondary);
+    padding: 1vw;
+
+}
+
+.tagList p {
+    font-size: 1.2rem;
+}
+
+/*Members*/
+.members img.avatar {
+    width: 3.5vw;
+    height: 3.5vw;
+    border-radius: 50px;
+    border: 2px solid var(--secondary);
+    margin-bottom: 3%;
+    margin-top: 3.5%;
+
+}
+
+.memberList {
+    min-height: 10vw;
+    border-top: 2px solid var(--secondary);
+    padding: 1vw;
+    font-family: General;
+
+}
+
+.member {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    border-bottom: 2px solid var(--secondary);
+
+}
+
+.members .userInfo {
+    margin-top: 3%;
+
+}
+
+.member p {
+    font-size: 1rem;
+    margin: 0;
+    line-height: 2vw;
+    padding-left: 0.5vw;
+    padding-right: 0.5vw;
+
+}
+
+.member button {
+    border: 2px solid var(--secondary);
+    border-radius: 30px;
+    margin: 2% 0;
+    font-size: 1rem;
+    padding: 1vw;
+    height: 3.2vw;
+    line-height: 0;
+    background-color: var(--primary);
+    margin-top: 5%;
+    font-family: General;
+
+}
+
+.member div.hLine {
+    border-width: 2px;
+}
+
+.member:last-of-type {
+    border-bottom: 0;
+
+}
+
+/*Version History*/
+
+.versionHistory {
+    border: 2px solid var(--secondary);
+    border-radius: 30px;
+    padding: 1vw;
+
+}
+
+.versionHistory table {
+    font-size: 1rem;
+    text-align: left;
+}
+
+.versionHistory th {
+    border-bottom: 2px solid var(--secondary);
+}
+
+.versionHistory td {
+    border-bottom: 1px solid var(--secondary);
+    padding-right: 0.5vw;
+
+}
+
+.versionHistory td:last-of-type {
+    width: 3vw;
+    padding: 0;
+}
+
+.versionHistory button {
+    all: unset;
+    padding-left: 1vw;
+    padding-right: 1vw;
+    margin-bottom: 0.1vw;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.5s;
+}
+
+/*Files*/
+
+.fileInput {
+    display: flex;
+    flex-direction: row;
+    border: 2px solid var(--secondary);
+    border-radius: 20px;
+    justify-content: space-between;
+    width: 80%;
+    margin: 2vw auto;
+}
+
+.fileInput input {
+    padding: 0;
+    width: 80%;
+    padding-left: 1.5vw;
+}
+
+.fileInput button {
+    width: 20%;
+}
+
+.uploadButton {
+    display: flex;
+    flex-direction: row;
+    border: 2px solid var(--secondary);
+    border-radius: 20px;
+    justify-content: space-between;
+    width: 80%;
+    margin: 0 auto;
+    margin-bottom: 2vw;
+}
+
+.uploadButton button {
+    all: unset;
+    font-size: 1.2rem;
+    padding-left: 2vw;
+}
+
+.uploadButton img {
+    width: 2.5vw;
+    height: 2.5vw;
+    padding: 0.5vw 1vw;
+
+}
+
+.fileList {
+    border-top: 2px solid var(--secondary);
+    font-size: 1.2rem;
+    padding-top: 1.5%;
+
+}
+
+.fileList p {
+    margin: 2% 10%;
+
+}
+
+/*Form Button*/
+.form #buttonContainer button {
+    border-radius: 25px;
+    padding: 1vw;
+    background-color: var(--primary);
+    color: var(--secondary);
+    border: 2px solid var(--secondary);
+    font-size: 1.6rem;
+    width: 23%;
+    transition: 0.5s;
+    font-family: General;
+}
+
+.form #buttonContainer button:hover {
+    cursor: pointer;
+    color: var(--accent);
+    background-color: var(--primary);
+    border-color: var(--accent);
+}
+
+.form #buttonContainer button.submit:hover {
+    cursor: pointer;
+    background-color: var(--secondary);
+    border-color: var(--primary);
+}
+
+.form #buttonContainer button.submit {
+    background-color: var(--accent);
+    color: var(--primary);
+    height: max-content;
+
+}
+
+#buttonContainer {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    border-top: 3px solid var(--secondary);
+    padding: 3%;
+    padding-right: 1vw;
+    width: 85%;
+    margin: 4vw auto;
+
+}
+
+div.createForm #buttonContainer, div.checkInForm #buttonContainer {
+    justify-content: flex-end;
+}
+
+
+
+/*Login*/
+
+div#logreg-container {
+    margin-top: 8vw;
+    margin-bottom: 13vw;
+    width: 30vw;
+    padding: 2vw 3.5vw;
+    padding-top: 3vw;
+    border: 3px solid var(--primary);
+    background-color: transparent;
+    color: var(--primary);
+}
+
+div#logreg-container h1 {
+    font-size: 70px;
+    margin: 0;
+}
+
+div#logreg-containerr button {
+    padding: 2%;
+}
+
+div#logreg-container .button-container {
+    border-top: 2px solid var(--primary);
+}
+
+div#logreg-container a {
+    color: var(--primary);
+    text-decoration: underline;
+    transition: 0.5s;
+    font-size: 22px;
+    padding-top: 1vw;
+    padding-left: 1vw;
+}
+
+div#logreg-container a:hover {
+    color: var(--accent);
+}

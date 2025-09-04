@@ -1,0 +1,295 @@
+/* 
+    Created on : Aug 18, 2025, 1:53:58 PM
+    Author     : ane
+*/
+
+:root[data-theme="dark"] {
+    --text: #191a2e;
+    --primary: #fcf4e9;
+    --secondary: #191a2e;
+    --tertiary: #0f3461;
+    --accent: #f66b0e;
+}
+
+@font-face {
+    font-family: Headings;
+    src: url(fonts/AstrogatorBB.ttf);
+}
+
+@font-face {
+    font-family: General;
+    src: url(fonts/PerihelionBB-Bold.ttf);
+}
+
+/*General*/
+
+html {
+    font-family: General;
+    color: var(--text);
+    border-color: var(--text);
+    background: linear-gradient(180deg, var(--secondary) 0%, var(--tertiary) 100%);
+    background-repeat: no-repeat;
+    min-height: 100vh;
+    width: 100vw;
+    overflow-x: clip;
+    position: relative;
+}
+
+html::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100%;
+    background-image: url('../assets/img/stars.jpg');
+    background-repeat: repeat;
+    mix-blend-mode: color-dodge;
+    z-index: -1;
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+body {
+    padding: 0;
+    margin: 0;
+}
+
+#splash {
+    color: var(--primary);
+    border-color: var(--primary);
+}
+
+a, nav ul, footer ul, nav button {
+    all: unset;
+}
+
+a {
+    cursor: pointer;
+}
+
+div.vLine {
+    border-left: 2px solid;
+}
+
+div.hLine {
+    border-bottom: 3px solid;
+}
+
+.accent {
+    color: var(--accent);
+}
+
+h1, h2, h3 {
+    font-family: Headings;
+
+}
+
+.active {
+    text-decoration: underline;
+}
+
+section {
+    min-height: 30vw;
+}
+
+/*Headers*/
+
+body#splash header {
+    display: flex;
+    align-content: center;
+    background-image: url("../assets/img/BuildLogo.svg");
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: left;
+    margin: 0 auto;
+    height: 90vh;
+    width: 50%;
+}
+
+/*Headings*/
+.heading1 {
+    font-size: 4rem;
+    color: var(--primary);
+    border-bottom: 4px solid var(--primary);
+    text-align: center;
+    padding: 0 2vw;
+    line-height: 2.5vw;
+    font-family: Headings;
+    margin-bottom: 0;
+    padding-bottom: 3%;
+    width: max-content;
+}
+
+.heading2{
+    color: var(--accent);
+    border-bottom: 3px solid var(--accent);
+    text-align: center;
+    font-size: 3rem;
+    text-align: center;
+    padding: 0 2vw;
+    line-height: 2.5vw;
+    font-family: Headings;
+    margin-bottom: 0;
+    width: max-content;
+}
+
+/*Nav*/
+
+nav {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-content: center;
+    width: 80%;
+    margin: 0 auto;
+    padding: 3vw 0 1vw;
+    color: var(--primary);
+    font-size: 1.25rem;
+}
+
+nav div {
+    display: flex;
+    flex-direction: row;
+    gap: 5vw;
+}
+
+nav div a, nav button {
+    border-radius: 1px;
+    padding: 10px;
+    flex-grow: 3;
+    transition: 0.5s;
+
+}
+
+nav div a:hover, nav button:hover {
+    color: var(--accent);
+    text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+}
+
+.active.accent:hover {
+    color: var(--primary);
+    text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+}
+
+nav.default-nav {
+    justify-content: flex-end;
+}
+
+nav.default-nav div a:last-of-type {
+    background-color: var(--accent);
+    color: var(--secondary);
+    border-radius: 10px;
+    padding: 10px 20px;
+    margin-left: 2vw;
+    border: 2px solid;
+}
+
+nav.default-nav div a:last-of-type:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+    background-color: var(--secondary);
+}
+
+.back {
+    visibility: hidden;
+    font-size: 1.688rem;
+    max-height: 1vw;
+}
+
+/*Footer*/
+
+footer {
+    display: flex;
+    flex-direction: column;
+    padding: 2% 0 1%;
+    border-top: 2px solid black;
+    text-align: center;
+    background-color: var(--secondary);
+    width: 100vw;
+    font-size: 1.25rem;
+    color: var(--primary);
+}
+
+footer div#footer-list {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 80%;
+    margin: 0 auto;
+    padding-bottom: 2vw;
+}
+
+footer div#footer-bottom {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 80%;
+    margin: 0 auto;
+    padding: 2vw 0;
+    border-top: 1px solid;
+}
+
+footer div#footer-bottom a {
+    padding-right: 2vw;
+}
+
+footer div#footer-bottom a:last-of-type {
+    padding-right: 0;
+}
+
+footer h3 {
+    font-size: 1.688rem;
+    font-family: Headings;
+    text-align: left;
+}
+
+footer ul {
+    text-align: left;
+    list-style-type: none;
+    line-height: 2;
+    display: flex;
+    flex-direction: column;
+}
+
+footer a {
+    transition: 0.5s;
+}
+
+footer a:hover {
+    color: var(--accent);
+    text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+}
+
+footer img {
+    width: 1.5vw;
+}
+
+
+/*Search Bar*/
+
+#searchBar {
+    width: 26vw;
+    display: flex;
+    flex-direction: row;
+    border-radius: 40px;
+    padding-left: 3%;
+    margin: 0 auto;
+    border-radius: 30px;
+    background-color: var(--secondary);
+    border: 3px solid var(--primary);
+    min-height: 2vw;
+}
+
+#searchBar input::placeholder {
+    color: var(--primary) !important;
+}
+
+div#searchBar input {
+    all: unset;
+    width: 100%;
+    flex: 4;
+    color: var(--primary) !important;
+    font-size: 16px;
+
+}
