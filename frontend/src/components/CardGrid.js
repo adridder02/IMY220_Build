@@ -1,27 +1,28 @@
-import React from 'react';
+import React, { useState } from 'react';
 import ProjectCards from './ProjectCards';
 
-const CardGrid = () => {
+const CardGrid = ({ projects }) => {
+    const [flipped, setFlipped] = useState({}); // track side
+
+    const handleFlip = (projectId) => {
+        setFlipped((prev) => ({ ...prev, [projectId]: !prev[projectId] }));
+    };
+
     return (
-        <>
-            <div className="cards">
+        <div className="cards">
+            {projects.map((project) => (
                 <ProjectCards
-                    side="front"
-                    projectName="Project Name"
-                    tags="#tag #tag #tag #tag"
-                    description="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+                    key={project.id}
+                    side={flipped[project.id] ? 'back' : 'front'}
+                    projectId={project.id}
+                    projectName={project.name}
+                    tags={project.tags.join(' #')}
+                    description={project.description}
+                    onFlip={() => handleFlip(project.id)}
                 />
-                <ProjectCards
-                    side="front"
-                    projectName="Project Name"
-                    tags="#tag #tag #tag #tag"
-                    description="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
-                />
-            </div>
-
-        </>
+            ))}
+        </div>
     );
-
 };
 
 export default CardGrid;

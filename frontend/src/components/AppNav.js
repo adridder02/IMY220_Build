@@ -1,7 +1,16 @@
-import React from 'react';
-import { NavLink } from 'react-router-dom';
+import React, { useContext } from 'react';
+import { NavLink, useNavigate } from 'react-router-dom';
+import { UserContext } from '../Session'
 
 const AppNav = () => {
+  const { logout } = useContext(UserContext);
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
+
   return (
     <nav>
       <div>
@@ -13,7 +22,7 @@ const AppNav = () => {
         <input type="text" placeholder="Search for..." />
       </div>
       <div>
-        <NavLink to="/login" className={({ isActive }) => isActive ? 'active accent' : ''}>Logout</NavLink>
+        <button onClick={handleLogout} className="logout-button">Logout</button>
       </div>
     </nav>
   );

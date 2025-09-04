@@ -1,13 +1,16 @@
-//23 - u23542676
 import React from 'react';
-import { createRoot } from 'react-dom/client';
-import { BrowserRouter as Router } from 'react-router-dom';
+import ReactDOM from 'react-dom';
+import { BrowserRouter } from 'react-router-dom';
 import App from './App';
+import { UserProvider } from './Session';
 
-
-const root = createRoot(document.getElementById('root'));
-root.render(
-    <Router>
+ReactDOM.render(
+  <React.StrictMode>
+    <BrowserRouter>
+      <UserProvider>
         <App />
-    </Router>
+      </UserProvider>
+    </BrowserRouter>
+  </React.StrictMode>,
+  document.getElementById('root')
 );

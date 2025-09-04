@@ -6,7 +6,6 @@ const ProfilePage = () => {
     const [activeSection, setActiveSection] = useState('Prof');
     const [activeSectionSide, setActiveSectionSide] = useState('Frie');
 
-
     const handleButtonClick = (section) => {
         setActiveSection(section);
     };

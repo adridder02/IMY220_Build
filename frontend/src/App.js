@@ -1,11 +1,10 @@
-
-import React from 'react';
-import { useEffect } from "react";
-import { Routes, Route, useLocation } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { Routes, Route, useLocation, Outlet } from 'react-router-dom';
 
 import SplashNav from './components/SplashNav';
 import AppNav from './components/AppNav';
 import Footer from './components/Footer';
+
 import SplashPage from './pages/SplashPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
@@ -14,95 +13,55 @@ import ProjectViewPage from './pages/ProjectViewPage';
 import ProjectsPage from './pages/ProjectsPage';
 import ProfilePage from './pages/ProfilePage';
 
+// not logged
+const SplashLayout = () => (
+  <>
+    <SplashNav />
+    <Outlet />
+    <Footer />
+  </>
+);
+
+// logged
+const AppLayout = () => (
+  <>
+    <AppNav />
+    <Outlet />
+    <Footer />
+  </>
+);
+
 function App() {
-    const location = useLocation();
+  const location = useLocation();
 
-    useEffect(() => {
-        if (location.pathname === "/") {
-            document.body.id = "splash";
-        } else if (location.pathname === "/home") {
-            document.body.id = "dash";
-        } else {
-        }
-    }, [location]);
+  useEffect(() => {
+    document.body.id = location.pathname === '/' ? 'splash' : 
+                      location.pathname === '/home' ? 'dash' : '';
+  }, [location]);
 
-    return (
-        <div>
-            <Routes>
-                <Route
-                    path="/"
-                    element={
-                        <>
-                            <SplashNav />
-                            <SplashPage />
-                            <Footer />
-                        </>
-                    }
-                />
-                <Route
-                    path="/login"
-                    element={
-                        <>
-                            <SplashNav />
-                            <LoginPage />
-                            <Footer />
-                        </>
-                    }
-                />
-                <Route
-                    path="/register"
-                    element={
-                        <>
-                            <SplashNav />
-                            <RegisterPage />
-                            <Footer />
-                        </>
-                    }
-                />
-                <Route
-                    path="/home"
-                    element={
-                        <>
-                            <AppNav />
-                            <HomePage />
-                            <Footer />
-                        </>
-                    }
-                />
-                <Route
-                    path="/projects"
-                    element={
-                        <>
-                            <AppNav />
-                            <ProjectsPage />
-                            <Footer />
-                        </>
-                    }
-                />
-                <Route
-                    path="/view"
-                    element={
-                        <>
-                            <AppNav />
-                            <ProjectViewPage />
-                            <Footer />
-                        </>
-                    }
-                />
-                <Route
-                    path="/profile"
-                    element={
-                        <>
-                            <AppNav />
-                            <ProfilePage />
-                            <Footer />
-                        </>
-                    }
-                />
+  return (
+    <div className="app-container">
+      <Routes>
+        {/* not logged */}
+        <Route element={<SplashLayout />}>
+          <Route path="/" element={<SplashPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+        </Route>
 
-            </Routes>
-        </div>
-    );
+        {/* logged */}
+        <Route element={<AppLayout />}>
+          <Route path="/home" element={<HomePage />} />
+          <Route path="/projects" element={<ProjectsPage />} />
+          <Route path="/view" element={<ProjectViewPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
+        </Route>
+
+        {/* fallback because its been bitching at me */}
+        <Route path="*" element={<div>404: Page Not Found</div>} />
+      </Routes>
+    </div>
+  );
 }
 
 export default App;

@@ -132,7 +132,7 @@ body#dash header div.vLine {
 
 /*Search Bar*/
 
-#filterSearch {
+.filterSearch {
     display: flex;
     flex-direction: column;
     border-radius: 40px;
@@ -147,11 +147,11 @@ body#dash header div.vLine {
 
 }
 
-#filterSearch input::placeholder {
+.filterSearch input::placeholder {
     color: var(--primary) !important;
 }
 
-#filterSearch input {
+.filterSearch input {
     all: unset;
     width: 100%;
     flex: 4;

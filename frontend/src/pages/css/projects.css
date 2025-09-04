@@ -130,6 +130,14 @@ p {
     margin: 0
 }
 
+.ActivityType1,
+.ActivityType2,
+.ActivityType3 {
+    margin-top: 1vw;
+
+
+}
+
 .ActivityType2 .ActivityType1,
 .ActivityType3 .ActivityType1,
 .ActivityType2:last-of-type,

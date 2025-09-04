@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import { VersionHistory } from "./FormComponents";
 import { ActivityType1, ActivityType2, ActivityType3 } from "./Activities";
+import { CheckInProject, EditProject } from "./ProjectForms";
 
 export const ViewActivity = () => {
     return (
@@ -48,16 +49,29 @@ export const ViewActivity = () => {
     );
 };
 
-export const ViewProject = () => {
+export const ViewProject = ({ projectId }) => {
+    const [showCheckInPopup, setShowCheckInPopup] = useState(false);
+    const [showEditPopup, setShowEditPopup] = useState(false);
+
     return (
         <>
+            {showCheckInPopup && (
+                <CheckInProject
+                    onClose={() => setShowCheckInPopup(false)}
+                />
+            )}
+            {showEditPopup && (
+                <EditProject
+                    onClose={() => setShowEditPopup(false)}
+                />
+            )}
             <div className='bar'>
                 <h2>Project Name</h2>
-                <button>Check In</button>
+                <button onClick={() => setShowCheckInPopup(true)}>Check In</button>
                 <button>Down</button>
                 <button>Memb</button>
                 <button>Chat</button>
-                <button>Edit</button>
+                <button onClick={() => setShowEditPopup(true)}>Edit</button>
             </div>
             <div className='leftSect'>
                 <h3>Files</h3>

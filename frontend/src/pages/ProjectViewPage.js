@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import './css/view.css';
 import { ViewActivity, ViewProject } from '../components/ViewComponents';
 
-const ProjectViewPage = () => {
+const ProjectViewPage = ({ projectId }) => {
     const [activeView, setActiveView] = useState('Proj');
 
     const handleButtonClick = (view) => {
@@ -29,9 +29,8 @@ const ProjectViewPage = () => {
                     <div className='hLine'></div>
                     <button>Back</button>
                 </div>
-                {activeView === 'Proj' && <ViewProject />}
+                {activeView === 'Proj' && <ViewProject projectId={projectId} />}
                 {activeView === 'Actv' && <ViewActivity />}
-
             </div>
         </>
     );
