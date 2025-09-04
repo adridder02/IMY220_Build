@@ -124,17 +124,19 @@ export const VersionHistory = () => {
     return (
         <div>
             <label>Version History</label>
-            <div class="versionHistory">
+            <div className="versionHistory">
                 <table>
-                    <tr>
-                        <th>Version</th>
-                        <th>Date</th>
-                        <th>Modified By</th>
-                        <th></th>
-                    </tr>
-                    <VersionHistoryRow />
-                    <VersionHistoryRow />
-                    <VersionHistoryRow />
+                    <tbody>
+                        <tr>
+                            <th>Version</th>
+                            <th>Date</th>
+                            <th>Modified By</th>
+                            <th></th>
+                        </tr>
+                        <VersionHistoryRow />
+                        <VersionHistoryRow />
+                        <VersionHistoryRow />
+                    </tbody>
                 </table>
             </div>
         </div>

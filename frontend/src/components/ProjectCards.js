@@ -1,5 +1,5 @@
 import React from 'react';
-
+import { Link } from 'react-router-dom';
 
 const ProjectCards = ({ side = 'front', projectName, tags, description }) => {
     return (
@@ -15,7 +15,9 @@ const ProjectCards = ({ side = 'front', projectName, tags, description }) => {
                     <h3>{projectName}</h3>
                     <div className="tags">{tags}</div>
                     <p>{description}</p>
-                    <button>Go to Project</button>
+                    <button>
+                        <Link to="/view">Go To Project</Link>
+                    </button>
                     <button>Check In</button>
                 </div>
             ) : (
@@ -27,7 +29,7 @@ const ProjectCards = ({ side = 'front', projectName, tags, description }) => {
                         </div>
                     </div>
                     <p>{description}</p>
-                    <button>Go to Project</button>
+                    <button>See Activity</button>
                     <button>Delete</button>
                 </div>
             )}

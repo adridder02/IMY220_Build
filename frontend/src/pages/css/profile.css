@@ -1,0 +1,87 @@
+/* 
+    Created on : Sep 4, 2025, 13:55:31 AM
+    Author     : ane
+*/
+
+.profile-container {
+    display: grid;
+    grid-template-areas:
+        "main change side";
+    grid-template-columns: 4fr auto 2fr;
+    column-gap: 2vw;
+    align-content: center;
+    margin: 5vw;
+}
+
+.mainCol {
+    grid-area: main;
+    background-color: var(--primary);
+    padding: 2vw;
+    border-radius: 30px;
+    min-height: 30vw;
+    display: flex;
+    flex-direction: column;
+    gap: 1vw;
+
+}
+
+.mainCol h2 {
+    text-align: center;
+    font-size: 2rem;
+}
+
+.mainCol button.edit {
+    margin-left: auto;
+}
+
+.changeButtons {
+    grid-area: change;
+    background-color: var(--primary);
+    padding: 2vw;
+    display: flex;
+    flex-direction: column;
+    gap: 1vw;
+    border-radius: 30px;
+    min-height: 30vw;
+
+}
+
+.changeButtons button,
+button.edit {
+    width: 4vw;
+    height: 4vw;
+    border: 2px solid var(--secondary);
+}
+
+div.changeButtons button.active,
+div.mainCol button.active {
+    border-color: var(--accent);
+    text-decoration: none;
+}
+
+.sideCol {
+    grid-area: side;
+    background-color: var(--primary);
+    padding: 10vw;
+    border-radius: 30px;
+    min-height: 30vw;
+}
+
+.mainCol img.pfp {
+    border-radius: 100%;
+    width: 15vw;
+    height: 15vw;
+    margin: 0 auto;
+    margin-top: 1vw;
+}
+
+/* Word Cloud */
+
+div.wordCloud {
+    border: 2px solid var(--secondary);
+    border-radius: 30px;
+    min-width: 10vw;
+    min-height: 20vw;
+    margin: 1vw 4vw;
+    text-align: center;
+}

@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { useEffect } from "react";
-import {Routes, Route, useLocation } from 'react-router-dom';
+import { Routes, Route, useLocation } from 'react-router-dom';
 
 import SplashNav from './components/SplashNav';
 import AppNav from './components/AppNav';
@@ -79,6 +79,27 @@ function App() {
                         </>
                     }
                 />
+                <Route
+                    path="/view"
+                    element={
+                        <>
+                            <AppNav />
+                            <ProjectViewPage />
+                            <Footer />
+                        </>
+                    }
+                />
+                <Route
+                    path="/profile"
+                    element={
+                        <>
+                            <AppNav />
+                            <ProfilePage />
+                            <Footer />
+                        </>
+                    }
+                />
+
             </Routes>
         </div>
     );
