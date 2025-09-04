@@ -3,7 +3,7 @@ const path = require("path");
 module.exports = {
     entry: "./frontend/src/index.js",
     output: {
-        path: path.resolve("public"),
+        path: path.resolve("./frontend/public"),
         filename: "bundle.js"
     },
     mode: "development",
@@ -17,9 +17,7 @@ module.exports = {
                 }
             },
             {
-                // Note to self: Not used in curr version cause its linked directly in the files
-                // due to the images in the css files causing trouble but if you need to add 
-                // them in the js we need this. eg import "./main.css";
+                // eg import "./css/main.css";
                 test: /\.css$/i,
                 use: [
                     "style-loader",

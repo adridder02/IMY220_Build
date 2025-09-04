@@ -1,11 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import "./css/forms.css"
 
 const LoginPage = () => {
     return (
         <>
-            <link rel="stylesheet" href="css/main.css" />
-            <link rel="stylesheet" href="css/forms.css" />
             <div className="form" id="logreg-container">
                 <h1>Login</h1>
                 <form action="/home">

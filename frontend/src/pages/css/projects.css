@@ -51,6 +51,7 @@ div.sort select {
     text-align: center;
     font-size: 1.1rem;
     padding: 0.8vw 0;
+    font-family: Headings;
 }
 
 div.sort .select-wrapper {
@@ -146,7 +147,8 @@ p {
 
 }
 
-.ActivityType2, .ActivityType3 {
+.ActivityType2,
+.ActivityType3 {
     display: flex;
     flex-direction: row;
     font-size: 1.1rem;
@@ -308,29 +310,6 @@ p {
 
 }
 
-.cards img {
-    width: 100%;
-}
-
-/*Project Images*/
-.projectImg {
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: cover;
-    background-color: white;
-    height: 10vw;
-    width: 100%;
-    border-width: 1px;
-    border-radius: 30px;
-    border: 2px solid var(--secondary);
-    margin-top: 0.7vw;
-}
-
-.imgLink {
-    background-image: url("../assets/img/placeholder.png");
-}
-
-
 /* Card Buttons */
 .cards button {
     border-radius: 30px;
@@ -371,6 +350,9 @@ p {
     justify-content: flex-end;
     width: 100%;
     margin: 0 auto;
+    position: absolute;
+    top: 0.3vw;
+    right: 0.3vw;
 }
 
 .cards button.info {
@@ -388,4 +370,18 @@ p {
     margin-top: 1vw;
     margin-right: 1vw;
 
+}
+
+.cards img {
+    width: 100%;
+    margin: 0 auto;
+    border-radius: 20px;
+    border: 2px solid var(--secondary);
+    display: block;
+}
+
+/*Project Images*/
+.projectImg {
+    position: relative;
+    display: inline-block;
 }

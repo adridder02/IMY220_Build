@@ -1,12 +1,14 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import "./css/main.css"
+import "./css/splash.css"
 
 const SplashPage = () => {
     return (
         <>
-            <link rel="stylesheet" href="css/main.css" />
-            <link rel="stylesheet" href="css/splash.css" />
-            <header></header>
+            <header>
+                <img src="assets/img/BuildLogo.svg" alt="Build Icon" />
+            </header>
             <section id="welcome">
                 <div>
                     <h1>Welcome to <span className="accent">Build</span></h1>
@@ -34,7 +36,7 @@ const SplashPage = () => {
             <div className="hLine"></div>
             <section id="get-started">
                 <h1>Get <span className="accent">Started</span></h1>
-                <p>Join <span className="accent">Build</span> today! Register with your email to start coding, collaborating, and building the future. Already a member? <Link to="/under_construction">Log in</Link> to dive into your projects.</p>
+                <p>Join <span className="accent">Build</span> today! Register with your email to start coding, collaborating, and building the future. Already a member? <Link to="/login">Log in</Link> to dive into your projects.</p>
                 <Link to="/register" id="call">Sign Up Free ➔</Link>
             </section>
         </>

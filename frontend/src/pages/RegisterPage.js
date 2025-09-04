@@ -1,11 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import "./css/forms.css"
 
 const RegisterPage = () => {
     return (
         <>
-            <link rel="stylesheet" href="css/main.css" />
-            <link rel="stylesheet" href="css/forms.css" />
             <div className="form" id="logreg-container">
                 <h1>Register</h1>
                 <form action="/home">

@@ -14,3 +14,16 @@ export const Sort = () => {
         </div>
     );
 };
+
+export const FilterSearch = ({ value, onChange }) => {
+  return (
+    <div id="filterSearch">
+      <input
+        type="text"
+        placeholder="Search for Project..."
+        value={value}
+        onChange={onChange}
+      />
+    </div>
+  );
+};

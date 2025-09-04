@@ -1,15 +1,13 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ActivityType1, ActivityType2, ActivityType3 } from '../components/Activities';
-import { Sort } from '../components/GeneralComps';
-
+import { FilterSearch, Sort } from '../components/GeneralComps';
+import "./css/projects.css"
+import "./css/home.css"
 
 const HomePage = () => {
     return (
         <>
-            <link rel="stylesheet" href="css/main.css" />
-            <link rel="stylesheet" href="css/projects.css" />
-            <link rel="stylesheet" href="css/home.css" />
             <header>
                 <img src="assets/img/BuildLogo.svg" alt="Build Icon" />
                 <div className="vLine"></div>
@@ -25,9 +23,7 @@ const HomePage = () => {
                     <button>Global</button>
                 </div>
                 <div className="filter">
-                    <div id="filterSearch">
-                        <input type="text" placeholder="Search for..." />
-                    </div>
+                    <FilterSearch />
                     <div className="hLine"></div>
                     <Sort />
                     <div className="hLine"></div>

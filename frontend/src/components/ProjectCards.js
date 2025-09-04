@@ -6,7 +6,8 @@ const ProjectCards = ({ side = 'front', projectName, tags, description }) => {
         <div className="card">
             {side === 'front' ? (
                 <div className='cardFront'>
-                    <div className="projectImg imgLink">
+                    <div className="projectImg">
+                        <img src="assets/img/placeholder.png" alt="projectImg" />
                         <div className="imgAddon">
                             <button className="info" type="button">i</button>
                         </div>
@@ -19,7 +20,8 @@ const ProjectCards = ({ side = 'front', projectName, tags, description }) => {
                 </div>
             ) : (
                 <div className='cardBack'>
-                    <div className="projectImg imgLink">
+                    <div className="projectImg">
+                        <img src="assets/img/placeholder.png" alt="projectImg" />
                         <div className="imgAddon">
                             <button className="info" type="button">i</button>
                         </div>
