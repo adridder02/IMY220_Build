@@ -8,7 +8,7 @@ const LoginPage = () => {
     const [error, setError] = useState('');
     const navigate = useNavigate();
 
-    // Redirect if already logged in
+    // if already logged in
     if (user) {
         return <Navigate to="/home" />;
     }
@@ -31,7 +31,7 @@ const LoginPage = () => {
             if (!response.ok) {
                 throw new Error(data.error || 'Login failed');
             }
-            console.log('Login response:', data.user); // Debug
+            console.log('Login response:', data.user); // debug
             setUser({ email: data.user.email, name: data.user.name });
             navigate('/home');
         } catch (err) {
