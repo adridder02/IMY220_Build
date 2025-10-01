@@ -70,7 +70,7 @@ export let projects = [
 export let activities = [
   {
     id: 1,
-    type: "ActivityType1",
+    actionType: "checkout",
     user: "Alice Smith",
     email: "user1@example.com",
     action: "checked out a project",
@@ -80,7 +80,7 @@ export let activities = [
   },
   {
     id: 2,
-    type: "ActivityType2",
+    actionType: "checkin",
     user: "Bob Jones",
     email: "user2@example.com",
     action: "checked in a project",
@@ -90,7 +90,7 @@ export let activities = [
   },
   {
     id: 3,
-    type: "ActivityType2",
+    actionType: "create",
     user: "Alice Smith",
     email: "user1@example.com",
     action: "created a project",
@@ -100,7 +100,7 @@ export let activities = [
   },
   {
     id: 4,
-    type: "ActivityType3",
+    actionType: "edit",
     user: "Bob Jones",
     email: "user2@example.com",
     action: "edited a project",

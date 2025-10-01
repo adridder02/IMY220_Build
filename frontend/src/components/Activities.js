@@ -20,7 +20,7 @@ export const ActivityType2 = ({ user, action, projectName, timestamp, descriptio
   return (
     <div className="ActivityType2">
       <div className="left">
-        <ActivityType1 
+        <ActivityType1
           user={user}
           action={action}
           projectName={projectName}
@@ -48,7 +48,7 @@ export const ActivityType3 = ({ user, action, projectName, timestamp, descriptio
   return (
     <div className="ActivityType3">
       <div className="left">
-        <ActivityType1 
+        <ActivityType1
           user={user}
           action={action}
           projectName={projectName}
@@ -63,40 +63,31 @@ export const ActivityType3 = ({ user, action, projectName, timestamp, descriptio
   );
 };
 
-const Activities = ({ activities }) => {
+const Activities = ({ activities, forProject = false }) => {
   return (
     <div className="activities">
       {activities.map((activity) => {
-        if (!activity) {
-          console.warn('Invalid activity: empty', activity);
-          return null;
-        }
-        // handle  structure: { id, type, user: string, email, action, projectName, timestamp, description }
-        // this is to stop the console screaming because of the sub props and empty things etc
         const props = {
-          user: activity.user || 'Unknown User',
-          action: activity.action || 'Unknown Action',
-          projectName: activity.projectName || 'Unknown Project',
+          user: activity.user,
+          action: activity.action,
+          projectName: activity.projectName,
           timestamp: activity.timestamp ? new Date(activity.timestamp).toLocaleString() : 'No Date',
-          description: activity.description || '',
-          cardTitle: activity.projectName || 'No Title',
-          cardDescription: activity.description || 'No description',
+          description: activity.description,
+          cardTitle: activity.projectName,
+          cardDescription: activity.description,
         };
 
-        switch (activity.type) {
-          case 'ActivityType1':
-            return <ActivityType1 key={activity.id} {...props} />;
-          case 'ActivityType2':
-            return <ActivityType2 key={activity.id} {...props} />;
-          case 'ActivityType3':
-            return <ActivityType3 key={activity.id} {...props} />;
-          default:
-            console.warn('Unknown activity type:', activity.type, activity);
-            return null;
+        if (activity.actionType === "checkout") {
+          return <ActivityType1 key={activity.id} {...props} />;
+        } else {
+          return forProject 
+            ? <ActivityType3 key={activity.id} {...props} />  // Project page
+            : <ActivityType2 key={activity.id} {...props} />; // Home page
         }
       })}
     </div>
   );
 };
+
 
 export default Activities;

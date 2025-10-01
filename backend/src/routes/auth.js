@@ -51,7 +51,10 @@ router.post("/login", (req, res) => {
     return res.status(401).json({ error: "Invalid email or password" });
   }
 
-  res.json({ message: "Login successful", user: { email, name: user.name } });
+  res.json({
+    message: "Login successful",
+    user: { id: user.id, email: user.email, name: user.firstName }
+  });
 });
 
 export default router;

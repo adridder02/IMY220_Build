@@ -35,8 +35,8 @@ function App() {
   const location = useLocation();
 
   useEffect(() => {
-    document.body.id = location.pathname === '/' ? 'splash' : 
-                      location.pathname === '/home' ? 'dash' : '';
+    document.body.id = location.pathname === '/' ? 'splash' :
+      location.pathname === '/home' ? 'dash' : '';
   }, [location]);
 
   return (
@@ -53,8 +53,8 @@ function App() {
         <Route element={<AppLayout />}>
           <Route path="/home" element={<HomePage />} />
           <Route path="/projects" element={<ProjectsPage />} />
-          <Route path="/view" element={<ProjectViewPage />} />
-          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/projects/:id" element={<ProjectViewPage />} />
+          <Route path="/profile/:id" element={<ProfilePage />} />
         </Route>
 
         {/* fallback because its been bitching at me */}

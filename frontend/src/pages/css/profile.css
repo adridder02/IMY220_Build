@@ -229,14 +229,13 @@ div.editGroup {
 }
 
 /* Mini Cards */
-
-.cardMini {
+.projectSection .cardMini {
     width: 30%;
     height: max-content;
 
 }
 
-div.cardMini:last-of-type {
+.projectSection div.cardMini:last-of-type {
     margin-left: 1vw;
     margin-right: auto;
 }

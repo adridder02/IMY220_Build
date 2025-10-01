@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 
-const ProjectCards = ({ side = 'front', projectName, tags, description, onFlip }) => {
+const ProjectCards = ({ side = 'front', projectId, projectName, tags, description, onFlip }) => {
     return (
         <div className="card">
             {side === 'front' ? (
@@ -19,7 +19,7 @@ const ProjectCards = ({ side = 'front', projectName, tags, description, onFlip }
                     <div className="tags">{tags}</div>
                     <p>{description}</p>
                     <button>
-                        <Link to="/view">Go to Project</Link>
+                        <Link to={`/projects/${projectId}`}>Go to Project</Link>
                     </button>
                     <button>Check In</button>
                 </div>

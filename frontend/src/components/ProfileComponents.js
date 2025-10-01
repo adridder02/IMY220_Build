@@ -301,7 +301,7 @@ export const FriendsSection = () => {
 export const Friend = () => {
     return (
         <div className='friend'>
-            <img src="assets/img/placeholder.png" alt="userPfp" className="avatar" />
+            <img src="/assets/img/placeholder.png" alt="userPfp" className="avatar" />
             <div className="userInfo">
                 <p>Name Surname</p>
                 <div className="hLine"></div>
@@ -334,7 +334,7 @@ export const ProjectSection = () => {
 export const CardMini = () => {
     return (
         <div className="cardMini">
-            <img src="assets/img/placeholder.png" alt="projectImg" />
+            <img src="/assets/img/placeholder.png" alt="projectImg" />
             <div className="hLine"></div>
             <h3>Project Name</h3>
         </div>

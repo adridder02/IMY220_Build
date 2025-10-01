@@ -18,13 +18,22 @@ export const UserProvider = ({ children }) => {
     }
   }, [user]);
 
+  const login = (loginData) => {
+    // expect loginData to include id, email, name
+    setUser({
+      id: loginData.id,       // added id
+      email: loginData.email,
+      name: loginData.name
+    });
+  };
+
   const logout = () => {
     setUser(null);
     localStorage.removeItem('user');
   };
 
   return (
-    <UserContext.Provider value={{ user, setUser, logout }}>
+    <UserContext.Provider value={{ user, setUser: login, logout }}>
       {children}
     </UserContext.Provider>
   );

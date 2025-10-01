@@ -1,12 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import { useParams, Navigate } from 'react-router-dom';
+import { UserContext } from '../Session';
+import {
+    ActivitySection,
+    EditProfile,
+    FriendsSection,
+    ProfileSection,
+    ProjectSection,
+    WordCloud,
+} from '../components/ProfileComponents';
 import './css/profile.css';
-import { ActivitySection, EditProfile, FriendsSection, ProfileSection, ProjectSection, WordCloud } from '../components/ProfileComponents';
 
 const ProfilePage = () => {
+    const { user, loading } = useContext(UserContext); // include loading
+    const { id } = useParams(); // get id from URL
     const [activeSection, setActiveSection] = useState('Prof');
     const [activeSectionSide, setActiveSectionSide] = useState('Frie');
+    const [profileLoading, setProfileLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-    // field visibility
     const [visibleFields, setVisibleFields] = useState({
         name: true,
         surname: true,
@@ -18,7 +30,6 @@ const ProfilePage = () => {
         about: true,
     });
 
-    // field values
     const [profileData, setProfileData] = useState({
         name: '',
         surname: '',
@@ -30,54 +41,62 @@ const ProfilePage = () => {
         about: '',
     });
 
-    const handleButtonClick = (section) => {
-        setActiveSection(section);
-    };
+    // fetch profile by ID
+    useEffect(() => {
+        const fetchProfile = async () => {
+            if (!id) return;
 
-    const handleButtonClickSide = (section) => {
-        setActiveSectionSide(section);
-    };
+            try {
+                const response = await fetch(`/api/users/${id}`);
+                if (!response.ok) throw new Error('Failed to fetch user');
+                const data = await response.json();
+                setProfileData(data);
+            } catch (err) {
+                console.error(err);
+                setError(err.message);
+            } finally {
+                setProfileLoading(false);
+            }
+        };
 
-    const handleEditToggle = () => {
-        setActiveSection(activeSection === 'Edit' ? 'Prof' : 'Edit');
-    };
+        fetchProfile();
+    }, [id]);
 
-    const updateVisibility = (field) => {
-        setVisibleFields((prev) => ({
-            ...prev,
-            [field]: !prev[field],
-        }));
-    };
+    const handleButtonClick = (section) => setActiveSection(section);
+    const handleButtonClickSide = (section) => setActiveSectionSide(section);
+    const handleEditToggle = () => setActiveSection(activeSection === 'Edit' ? 'Prof' : 'Edit');
 
-    const updateFieldValue = (field, value) => {
-        setProfileData((prev) => ({
-            ...prev,
-            [field]: value,
-        }));
-    };
+    const updateVisibility = (field) =>
+        setVisibleFields((prev) => ({ ...prev, [field]: !prev[field] }));
+
+    const updateFieldValue = (field, value) =>
+        setProfileData((prev) => ({ ...prev, [field]: value }));
+
+    // wait for user context to load before redirecting
+    if (loading || profileLoading) return <div>Loading...</div>;
+
+    if (!user) return <Navigate to="/login" />;
+
+    if (error) return <div>Error: {error}</div>;
 
     return (
-        <div className='profile-container'>
-            <div className='mainCol'>
-                {(activeSection === 'Prof' || activeSection === 'Edit') &&
+        <div className="profile-container">
+            <div className="mainCol">
+                {(activeSection === 'Prof' || activeSection === 'Edit') && (
                     <button
                         className={activeSection === 'Edit' ? 'active edit' : 'edit'}
                         onClick={handleEditToggle}
                     >
                         {activeSection === 'Edit' ? 'Save' : 'Edit'}
                     </button>
-                }
-                <img src='assets/img/placeholder.png' alt='pfp' className='pfp' />
-                <h2>User Name</h2>
-                <div className='hLine'></div>
+                )}
+                <img src="/assets/img/placeholder.png" alt="pfp" className="pfp" />
+                <h2>{profileData.name} {profileData.surname}</h2>
+                <div className="hLine"></div>
 
                 {activeSection === 'Prof' && (
-                    <ProfileSection
-                        visibleFields={visibleFields}
-                        profileData={profileData}
-                    />
+                    <ProfileSection visibleFields={visibleFields} profileData={profileData} />
                 )}
-
                 {activeSection === 'Actv' && <ActivitySection />}
                 {activeSection === 'Clou' && <WordCloud />}
                 {activeSection === 'Edit' && (
@@ -90,35 +109,40 @@ const ProfilePage = () => {
                 )}
             </div>
 
-            <div className='changeButtons'>
+            <div className="changeButtons">
                 <button
                     className={activeSection === 'Prof' ? 'active' : ''}
                     onClick={() => handleButtonClick('Prof')}
                 >
-                    Prof</button>
+                    Prof
+                </button>
                 <button
                     className={activeSection === 'Actv' ? 'active' : ''}
                     onClick={() => handleButtonClick('Actv')}
                 >
-                    Actv</button>
+                    Actv
+                </button>
                 <button
                     className={activeSection === 'Clou' ? 'active' : ''}
                     onClick={() => handleButtonClick('Clou')}
                 >
-                    Clou</button>
+                    Clou
+                </button>
                 <button
                     className={activeSectionSide === 'Frie' ? 'active' : ''}
                     onClick={() => handleButtonClickSide('Frie')}
                 >
-                    Frie</button>
+                    Frie
+                </button>
                 <button
                     className={activeSectionSide === 'Proj' ? 'active' : ''}
                     onClick={() => handleButtonClickSide('Proj')}
                 >
-                    Proj</button>
+                    Proj
+                </button>
             </div>
 
-            <div className='sideCol'>
+            <div className="sideCol">
                 {activeSectionSide === 'Frie' && <FriendsSection />}
                 {activeSectionSide === 'Proj' && <ProjectSection />}
             </div>

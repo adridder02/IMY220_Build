@@ -3,7 +3,7 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { UserContext } from '../Session'
 
 const AppNav = () => {
-  const { logout } = useContext(UserContext);
+  const { user, logout } = useContext(UserContext); // get user id
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -15,7 +15,14 @@ const AppNav = () => {
     <nav>
       <div>
         <NavLink to="/home" className={({ isActive }) => isActive ? 'active accent' : ''}>Home</NavLink>
-        <NavLink to="/profile" className={({ isActive }) => isActive ? 'active accent' : ''}>Profile</NavLink>
+        {user && (
+          <NavLink
+            to={`/profile/${user.id}`}
+            className={({ isActive }) => isActive ? 'active accent' : ''}
+          >
+            Profile
+          </NavLink>
+        )}
         <NavLink to="/projects" className={({ isActive }) => isActive ? 'active accent' : ''}>Projects</NavLink>
       </div>
       <div id="searchBar">
