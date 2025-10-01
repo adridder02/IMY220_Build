@@ -145,6 +145,10 @@ form textarea {
     min-height: 15vw;
 }
 
+div.checkInForm #buttonContainer {
+    margin-bottom: 0;
+}
+
 /*Upload Image*/
 
 .uploadArea {
@@ -227,7 +231,8 @@ form .tags,
 
 .tagInput input,
 .addFiles input,
-.memberInput input {
+.memberInput input,
+.friendInput input  {
     border: none;
 }
 
@@ -244,7 +249,8 @@ form .tags,
 
 .tagInput button,
 .fileInput button,
-.memberInput button {
+.memberInput button,
+.friendInput button {
     all: unset;
     width: 20%;
     border: 2px solid var(--secondary);
@@ -256,7 +262,8 @@ form .tags,
 
 .tagInput button:hover,
 .fileInput button:hover,
-.memberInput button:hover {
+.memberInput button:hover,
+.friendInput button:hover {
     cursor: pointer;
     background-color: var(--accent);
     color: var(--primary);
@@ -305,14 +312,14 @@ form .tags,
 }
 
 .members .userInfo {
-    margin-top: 3%;
+    margin-top: 7%;
 
 }
 
 .member p {
-    font-size: 1rem;
+    font-size: 0.9rem;
     margin: 0;
-    line-height: 2vw;
+    line-height: 1vw;
     padding-left: 0.5vw;
     padding-right: 0.5vw;
 
@@ -320,14 +327,14 @@ form .tags,
 
 .member button {
     border: 2px solid var(--secondary);
-    border-radius: 30px;
+    border-radius: 18px;
     margin: 2% 0;
-    font-size: 1rem;
-    padding: 1vw;
-    height: 3.2vw;
+    font-size: 0.8rem;
+    padding: 0.5vw;
+    height: 3vw;
     line-height: 0;
     background-color: var(--primary);
-    margin-top: 5%;
+    margin-top: 6%;
     font-family: General;
 
 }
@@ -430,6 +437,7 @@ form .tags,
     border-top: 2px solid var(--secondary);
     font-size: 1.2rem;
     padding-top: 1.5%;
+    min-height: 10vw;
 
 }
 
@@ -483,7 +491,8 @@ form .tags,
 
 }
 
-div.createForm #buttonContainer, div.checkInForm #buttonContainer {
+div.createForm #buttonContainer,
+div.checkInForm #buttonContainer {
     justify-content: flex-end;
 }
 

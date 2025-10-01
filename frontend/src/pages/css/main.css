@@ -135,6 +135,19 @@ body#splash header img {
     width: max-content;
 }
 
+.heading3 {
+    color: var(--secondary);
+    border-bottom: 3.5px solid var(--secondary);
+    text-align: center;
+    font-size: 2.5rem;
+    text-align: center;
+    padding: 0 2vw;
+    line-height: 2.5vw;
+    font-family: Headings;
+    margin-bottom: 0;
+    width: max-content;
+}
+
 /*Nav*/
 
 nav {

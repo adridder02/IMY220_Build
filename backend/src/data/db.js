@@ -1,6 +1,28 @@
 export let users = [
-  { email: "user1@example.com", password: "password123", name: "Alice Smith" },
-  { email: "user2@example.com", password: "password456", name: "Bob Jones" },
+  { 
+    id: 1, 
+    email: "user1@example.com", 
+    password: "password123", 
+    firstName: "Alice", 
+    lastName: "Smith",
+    organization: "Example Corp",
+    about: "Software engineer passionate about web apps.",
+    phone: "123-456-7890",
+    dob: "1990-01-01",
+    country: "USA"
+  },
+  { 
+    id: 2, 
+    email: "user2@example.com", 
+    password: "password456", 
+    firstName: "Bob", 
+    lastName: "Jones",
+    organization: "Tech Inc",
+    about: "Mobile dev expert.",
+    phone: "987-654-3210",
+    dob: "1985-05-15",
+    country: "Canada"
+  },
 ];
 
 export let projects = [

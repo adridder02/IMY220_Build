@@ -131,7 +131,7 @@ export const Member = ({ email, name }) => {
                 <p>{email}</p>
             </div>
             <div className="vLine"></div>
-            <button>Manage</button>
+            <button>View</button>
         </div>
     );
 };

@@ -13,7 +13,7 @@ const ProjectViewPage = ({ projectId }) => {
         <>
             <div className='view-container' id={activeView === 'Proj' ? 'project-view' : 'activity-view'}>
                 <div className='menu'>
-                    <h3>Menu</h3>
+                    <h3 className="heading3">Menu</h3>
                     <button
                         className={activeView === 'Proj' ? 'active' : ''}
                         onClick={() => handleButtonClick('Proj')}

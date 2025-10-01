@@ -22,7 +22,8 @@
     display: flex;
     flex-direction: column;
     gap: 1vw;
-
+    height: max-content;
+    padding-bottom: 4vw;
 }
 
 .mainCol h2 {
@@ -43,6 +44,7 @@
     gap: 1vw;
     border-radius: 30px;
     min-height: 30vw;
+    height: max-content;
 
 }
 
@@ -62,9 +64,11 @@ div.mainCol button.active {
 .sideCol {
     grid-area: side;
     background-color: var(--primary);
-    padding: 10vw;
     border-radius: 30px;
     min-height: 30vw;
+    max-height: max-content;
+    width: 25vw;
+
 }
 
 .mainCol img.pfp {
@@ -73,6 +77,7 @@ div.mainCol button.active {
     height: 15vw;
     margin: 0 auto;
     margin-top: 1vw;
+    border: 2px solid var(--secondary);
 }
 
 /* Word Cloud */
@@ -84,4 +89,259 @@ div.wordCloud {
     min-height: 20vw;
     margin: 1vw 4vw;
     text-align: center;
+}
+
+/* Profile */
+.profileInfo div {
+    display: flex;
+    flex-direction: column;
+    line-height: 3vw;
+    font-size: 24px;
+
+}
+
+.profileInfo label {
+    margin-left: 1.5vw;
+    margin-bottom: 0.5vw;
+}
+
+.profileInfo input,
+.profileInfo textarea {
+    border-radius: 20px;
+    padding: 5%;
+    background-color: var(--primary);
+    border: 2px solid;
+    font-size: 18px;
+    padding-left: 1.5vw;
+}
+
+.profileInfo p {
+    border-radius: 20px;
+    background-color: var(--primary);
+    border: 2px solid;
+    font-size: 18px;
+    padding-left: 1.5vw;
+}
+
+.profileInfo textarea {
+    min-height: 15vw;
+}
+
+.profileInfo {
+    display: flex;
+    flex-direction: row;
+    column-gap: 2vw;
+    width: 90%;
+    padding: 1vw;
+    margin: 0 auto;
+}
+
+.profileInfo .leftCol {
+    display: flex;
+    flex-direction: column;
+    flex: 2;
+    gap: 1vw;
+}
+
+.profileInfo .rightCol {
+    display: flex;
+    flex-direction: column;
+    flex: 2;
+    gap: 1vw;
+}
+
+/* Activity */
+
+.profileActivity {
+    width: 90%;
+    margin: 0 auto;
+
+}
+
+/*Switch*/
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 68px;
+    height: 37px;
+    margin-right: 1vw;
+    margin-top: 5px;
+
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--primary);
+    border: 2px solid var(--secondary);
+    -webkit-transition: .4s;
+    transition: .4s;
+    border-radius: 30px;
+
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 6px;
+    top: 3.5px;
+    bottom: 4px;
+    background-color: var(--secondary);
+    -webkit-transition: .4s;
+    transition: .4s;
+    border-radius: 30px;
+
+}
+
+input:checked+.slider {
+    background-color: var(--accent);
+}
+
+input:focus+.slider {
+    box-shadow: 0 0 1px var(--primary);
+}
+
+input:checked+.slider:before {
+    -webkit-transform: translateX(26px);
+    -ms-transform: translateX(26px);
+    transform: translateX(26px);
+}
+
+/* Edit */
+
+div.editGroup {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+/* Mini Cards */
+
+.cardMini {
+    width: 30%;
+    height: max-content;
+
+}
+
+div.cardMini:last-of-type {
+    margin-left: 1vw;
+    margin-right: auto;
+}
+
+.projectList {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    width: 90%;
+    padding: 1vw;
+    row-gap: 1vw;
+}
+
+div#projSectLine.hLine {
+    width: 85%;
+    margin: 0 auto;
+    margin-top: 1.5vw;
+}
+
+.projectSection h2 {
+    margin: 1vw auto;
+    padding-bottom: 1vw;
+    margin-top: 2.5vw;
+}
+
+.projectSection button {
+    margin: 2.5vw auto;
+    padding: 1vw 4vw;
+    border-radius: 30px;
+    font-size: 1.5rem;
+    margin-bottom: 3vw;
+}
+
+.projectSection {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+/* Friends Section */
+
+.friendInput input {
+    all: unset;
+    padding: 5%;
+
+}
+
+.friendInput {
+    display: flex;
+    flex-direction: row;
+    border: 2px solid var(--secondary);
+    border-radius: 20px;
+    justify-content: space-between;
+    width: 80%;
+    margin: 2vw auto;
+}
+
+.friendInput button {
+    font-size: 1.5rem;
+}
+
+.friend {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    width: 90%;
+    margin: 0 auto;
+    padding: 0 0.5vw;
+    border-bottom: 2px solid var(--secondary);
+}
+
+.friend img {
+    max-width: 3vw;
+    max-height: 3vw;
+    margin: 0.7vw 0;
+}
+
+.friend .userInfo {
+    padding: 0 1vw;
+    padding-top: 0.3vw;
+    margin: 0.5vw 0;
+
+}
+
+.friend button {
+    flex: 0.7;
+    margin: 0.7vw;
+    border-radius: 30px;
+    margin-right: 0;
+    margin-left: 1vw;
+    height: max-content;
+    margin-top: 1.4vw;
+
+}
+
+.friend p {
+    font-size: 1rem;
+    margin: 0;
+    padding-left: 0.5vw;
+    padding-right: 0.5vw;
+    line-height: 1.5vw;
+
+}
+
+.friend:last-of-type {
+    border-bottom: 0;
+
 }

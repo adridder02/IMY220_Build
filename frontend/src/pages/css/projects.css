@@ -131,8 +131,7 @@ p {
 }
 
 .ActivityType1,
-.ActivityType2,
-.ActivityType3 {
+.ActivityType2 {
     margin-top: 1vw;
 
 
@@ -171,7 +170,6 @@ p {
 
 .right {
     flex: 1;
-
     margin-left: 1vw;
 }
 
@@ -219,6 +217,11 @@ p {
 
 .cardMini .hLine {
     border-width: 2px;
+}
+
+.ActivityType3 .info {
+    width: 85%;
+    margin-left: 5vw;
 }
 
 

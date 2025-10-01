@@ -13,7 +13,6 @@
     gap: 2vw;
     align-content: center;
     margin: 5vw;
-    background-color: red;
 }
 
 .view-container#activity-view {
@@ -22,49 +21,298 @@
         "menuS bar rightS"
         "menuS leftS rightS";
     grid-template-columns: 0.7fr auto 4fr;
-    grid-template-rows: 1fr auto;
+    grid-template-rows: auto 1fr;
+
     gap: 2vw;
     align-content: center;
     margin: 5vw;
-    background-color: red;
-}
+    margin-right: 7vw;
 
+}
 
 .menu {
     grid-area: menuS;
-    background-color: blue;
-    padding: 2vw;
+    background-color: var(--primary);
+    padding: 0 1vw;
+    padding-bottom: 2vw;
     border-radius: 30px;
     display: flex;
     flex-direction: column;
     gap: 1vw;
+    min-height: 35vw;
+    height: max-content;
+    width: 8vw;
 }
 
-.bar {
+.leftSect h3 {
+    font-size: 1.7rem;
+
+}
+
+.rightSect h3 {
+    font-size: 2rem;
+
+}
+
+
+
+/* Project Activity */
+
+.view-container#activity-view .leftSect h3,
+.view-container#activity-view .rightSect h3 {
+    margin-top: 3vw;
+    margin-bottom: 1.5vw;
+
+}
+
+.view-container#activity-view .bar {
     grid-area: bar;
-    background-color: pink;
-    padding: 1vw;
     border-radius: 30px;
     display: flex;
     flex-direction: row;
-    max-height: 5vw;
+    padding: 0.7vw;
+    height: max-content;
 }
 
-.leftSect {
+.view-container#activity-view .leftSect {
+    background-color: var(--primary);
     grid-area: leftS;
-    background-color: green;
-    padding: 2vw;
+    min-width: 30vw;
+    border-radius: 30px;
+    height: max-content;
+    padding-bottom: 3vw;
+}
+
+.view-container#activity-view .rightSect {
+    background-color: var(--primary);
+    grid-area: rightS;
+    display: flex;
+    flex-direction: column;
+    border-radius: 30px;
+    width: 100%;
+    padding: 1vw;
+    padding-bottom: 3vw;
+
+}
+
+.view-container#activity-view button.graphView,
+.view-container#activity-view button.memView {
+    width: 15vw;
+    font-size: 1.5rem;
+    height: 4vw;
+    padding: 1vw;
+    text-align: center;
+    border-radius: 22px;
+}
+
+.view-container#activity-view button.graphView.active {
+    background-color: var(--secondary);
+    border-color: var(--primary);
+    color: var(--primary);
+    transition: 0.5s;
+    text-decoration: none;
+}
+
+
+.view-container#activity-view button.graphView.active:hover {
+    background-color: var(--secondary);
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.viewActivity {
+    width: 90%;
+    margin: 0 auto;
+}
+
+/* Member List */
+.leftSect .member button {
+    border-radius: 30px;
+    margin: 2% 0;
+    font-size: 1rem;
+    padding: 1.5vw 2vw;
+    height: 3vw;
+    line-height: 0;
+    margin-top: 4.5%;
+
+}
+
+.leftSect .member .userInfo {
+    margin-top: 5%;
+    font-size: 1rem;
+
+}
+
+.leftSect .member {
+    padding: 1vw 0;
+}
+
+
+.viewMembers {
+    width: 90%;
+    margin: 0 auto;
+
+}
+
+
+/*Version History*/
+.leftSect .versionHistory {
+    border: none;
+    margin: 0 auto;
+}
+
+.leftSect .versionHistory table {
+    margin: 0 auto
+}
+
+.leftSect .versionHistory p {
+    text-align: center;
+
+}
+
+
+/* Menu */
+.menu h3,
+.leftSect h3,
+.rightSect h3 {
+    margin: 1vw auto;
+    padding-bottom: 0.5vw;
+    border-width: 3px;
+}
+
+.menu h3 {
+    margin-top: 2.5vw;
+    font-size: 1.5rem;
+
+
+}
+
+.menu button {
+    width: 5vw;
+    height: 5vw;
+    border: 2px solid var(--secondary);
+    margin: 0 auto;
+    border-radius: 22px;
+
+}
+
+.menu button.active {
+    border-color: var(--accent);
+    text-decoration: none;
+}
+
+.menu .hLine {
+    margin-top: auto;
+    margin-bottom: 1vw;
+}
+
+/* Project View */
+.view-container#project-view .bar {
+    grid-area: bar;
+    background-color: var(--primary);
+    border-radius: 30px;
+    display: flex;
+    flex-direction: row;
+    padding: 0.7vw;
+    height: max-content;
+}
+
+.view-container#project-view .leftSect {
+    grid-area: leftS;
+    background-color: var(--primary);
     min-width: 15vw;
     border-radius: 30px;
+
 }
 
-.rightSect {
+.view-container#project-view .rightSect {
     grid-area: rightS;
-    background-color: yellow;
-    padding: 1vw 2vw;
+    background-color: var(--primary);
     display: flex;
     flex-direction: column;
     gap: 1vw;
     border-radius: 30px;
+    width: 100%;
 
+}
+
+.view-container#project-view .rightSect .fileDisplay {
+    padding: 3vw;
+    display: flex;
+    flex-direction: column;
+    gap: 1vw;
+}
+
+.view-container#project-view .rightSect .form {
+    width: 100%;
+
+}
+
+.view-container#project-view .rightSect div.popup {
+    margin: 0;
+}
+
+.view-container#project-view .leftSect {
+    height: max-content;
+    padding-bottom: 3vw;
+}
+
+.view-container#project-view .leftSect p {
+    padding: 0.7vw 0;
+    font-size: 1.2rem;
+}
+
+.view-container#project-view .rightSect {
+    min-height: 30vw;
+    height: max-content;
+}
+
+.view-container#project-view .barButtons {
+    display: flex;
+    flex-direction: row;
+    margin-left: auto;
+    column-gap: 1vw;
+}
+
+.view-container#project-view .barButtons button {
+    width: 4vw;
+    height: 4vw;
+    padding: 1vw;
+    text-align: center;
+    border-radius: 22px;
+}
+
+.view-container#project-view .barButtons .checkIn {
+    width: 15vw;
+    font-size: 1.5rem;
+    border-color: var(--accent);
+} 
+
+.view-container#project-view .barButtons .checkIn:hover {
+    border: var(--secondary);
+}
+
+.view-container#project-view .bar h2 {
+    margin-left: 2vw;
+
+}
+
+.view-container#project-view .fileButtons {
+    display: flex;
+    flex-direction: column;
+    margin: 0 2vw;
+    gap: 1vw;
+}
+
+.view-container#project-view .fileButtons button {
+    padding: 0.5vw;
+    border-radius: 30px;
+
+}
+
+
+.leftSect h3,
+.rightSect h3 {
+    margin-top: 2.5vw;
+    margin-bottom: 1.5vw;
 }

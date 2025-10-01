@@ -1,101 +1,272 @@
 import React from 'react';
 import { ActivityType1, ActivityType3 } from '../components/Activities';
+import { Link } from 'react-router-dom';
 
-export const ProfileSection = () => {
+export const ProfileSection = ({ visibleFields, profileData }) => {
     return (
-        <>
-            <div>
-                <label>Name</label>
-                <input type="text" placeholder="Name" />
+        <div className='profileInfo'>
+            <div className='leftCol'>
+                {visibleFields.name && (
+                    <div>
+                        <label>Name</label>
+                        <p>{profileData.name || '-'}</p>
+                    </div>
+                )}
+
+                {visibleFields.surname && (
+                    <div>
+                        <label>Surname</label>
+                        <p>{profileData.surname || '-'}</p>
+                    </div>
+                )}
+
+                {visibleFields.email && (
+                    <div>
+                        <label>Email</label>
+                        <p>{profileData.email || '-'}</p>
+                    </div>
+                )}
+
+                {visibleFields.phone && (
+                    <div>
+                        <label>Phone Number</label>
+                        <p>{profileData.phone || '-'}</p>
+                    </div>
+                )}
+
+                {visibleFields.dob && (
+                    <div>
+                        <label>Date of Birth</label>
+                        <p>{profileData.dob || '-'}</p>
+                    </div>
+                )}
             </div>
 
-            <div>
-                <label>Surname</label>
-                <input type="text" placeholder="Surname"></input>
+            <div className='rightCol'>
+                {visibleFields.country && (
+                    <div>
+                        <label>Country</label>
+                        <p>{profileData.country || '-'}</p>
+                    </div>
+                )}
+
+                {visibleFields.organization && (
+                    <div>
+                        <label>Organization</label>
+                        <p>{profileData.organization || '-'}</p>
+                    </div>
+                )}
+
+                {visibleFields.about && (
+                    <div>
+                        <label>About</label>
+                        <p>{profileData.about || '-'}</p>
+                    </div>
+                )}
             </div>
-            <div>
-                <label>Email</label>
-                <input type="text" placeholder="example@gmail.com"></input>
-            </div>
-            <div>
-                <label>Organization</label>
-                <input type="text" placeholder="Company Name"></input>
-            </div>
-            <div>
-                <label>About</label>
-                <textarea placeholder="About you"></textarea>
-            </div>
-        </>
+        </div>
     );
 };
 
-export const EditProfile = () => {
+export const EditProfile = ({ visibleFields, updateVisibility, profileData, updateFieldValue }) => {
     return (
-        <>
-            <div>
-                <label>Name</label>
-                <input type="text" placeholder="Name" />
+        <div className='profileInfo'>
+            <div className='leftCol'>
+                <div>
+                    <div className='editGroup'>
+                        <label>Name</label>
+                        <label className="switch">
+                            <input
+                                type="checkbox"
+                                checked={visibleFields.name}
+                                onChange={() => updateVisibility('name')}
+                            />
+                            <span className="slider"></span>
+                        </label>
+                    </div>
+                    <input
+                        type="text"
+                        value={profileData.name}
+                        placeholder="Name"
+                        onChange={(e) => updateFieldValue('name', e.target.value)}
+                    />
+                </div>
+
+                <div>
+                    <div className='editGroup'>
+                        <label>Surname</label>
+                        <label className="switch">
+                            <input
+                                type="checkbox"
+                                checked={visibleFields.surname}
+                                onChange={() => updateVisibility('surname')}
+                            />
+                            <span className="slider"></span>
+                        </label>
+                    </div>
+                    <input
+                        type="text"
+                        value={profileData.surname}
+                        placeholder="Surname"
+                        onChange={(e) => updateFieldValue('surname', e.target.value)}
+                    />
+                </div>
+
+                <div>
+                    <div className='editGroup'>
+                        <label>Email</label>
+                        <label className="switch">
+                            <input
+                                type="checkbox"
+                                checked={visibleFields.email}
+                                onChange={() => updateVisibility('email')}
+                            />
+                            <span className="slider"></span>
+                        </label>
+                    </div>
+                    <input
+                        type="text"
+                        value={profileData.email}
+                        placeholder="example@gmail.com"
+                        onChange={(e) => updateFieldValue('email', e.target.value)}
+                    />
+                </div>
+
+                <div>
+                    <div className='editGroup'>
+                        <label>Phone Number</label>
+                        <label className="switch">
+                            <input
+                                type="checkbox"
+                                checked={visibleFields.phone}
+                                onChange={() => updateVisibility('phone')}
+                            />
+                            <span className="slider"></span>
+                        </label>
+                    </div>
+                    <input
+                        type="text"
+                        value={profileData.phone}
+                        placeholder="081 123 1234"
+                        onChange={(e) => updateFieldValue('phone', e.target.value)}
+                    />
+                </div>
+
+                <div>
+                    <div className='editGroup'>
+                        <label>Date of Birth</label>
+                        <label className="switch">
+                            <input
+                                type="checkbox"
+                                checked={visibleFields.dob}
+                                onChange={() => updateVisibility('dob')}
+                            />
+                            <span className="slider"></span>
+                        </label>
+                    </div>
+                    <input
+                        type="text"
+                        value={profileData.dob}
+                        placeholder="18/12/2001"
+                        onChange={(e) => updateFieldValue('dob', e.target.value)}
+                    />
+                </div>
             </div>
-            <div>
-                <label>Surname</label>
-                <input type="text" placeholder="Surname"></input>
+
+            <div className='rightCol'>
+                <div>
+                    <div className='editGroup'>
+                        <label>Country</label>
+                        <label className="switch">
+                            <input
+                                type="checkbox"
+                                checked={visibleFields.country}
+                                onChange={() => updateVisibility('country')}
+                            />
+                            <span className="slider"></span>
+                        </label>
+                    </div>
+                    <input
+                        type="text"
+                        value={profileData.country}
+                        placeholder="America"
+                        onChange={(e) => updateFieldValue('country', e.target.value)}
+                    />
+                </div>
+
+                <div>
+                    <div className='editGroup'>
+                        <label>Organization</label>
+                        <label className="switch">
+                            <input
+                                type="checkbox"
+                                checked={visibleFields.organization}
+                                onChange={() => updateVisibility('organization')}
+                            />
+                            <span className="slider"></span>
+                        </label>
+                    </div>
+                    <input
+                        type="text"
+                        value={profileData.organization}
+                        placeholder="Company Name"
+                        onChange={(e) => updateFieldValue('organization', e.target.value)}
+                    />
+                </div>
+
+                <div>
+                    <div className='editGroup'>
+                        <label>About</label>
+                        <label className="switch">
+                            <input
+                                type="checkbox"
+                                checked={visibleFields.about}
+                                onChange={() => updateVisibility('about')}
+                            />
+                            <span className="slider"></span>
+                        </label>
+                    </div>
+                    <textarea
+                        value={profileData.about}
+                        placeholder="About you"
+                        onChange={(e) => updateFieldValue('about', e.target.value)}
+                    />
+                </div>
             </div>
-            <div>
-                <label>Email</label>
-                <input type="text" placeholder="example@gmail.com"></input>
-            </div>
-            <div>
-                <label>Phone Number</label>
-                <input type="text" placeholder="081 123 1234"></input>
-            </div>
-            <div>
-                <label>Date of Birth</label>
-                <input type="text" placeholder="18/12/2001"></input>
-            </div>
-            <div>
-                <label>Country</label>
-                <input type="text" placeholder="America"></input>
-            </div>
-            <div>
-                <label>Organization</label>
-                <input type="text" placeholder="Company Name"></input>
-            </div>
-            <div>
-                <label>About</label>
-                <textarea placeholder="About you"></textarea>
-            </div>
-        </>
+        </div>
     );
 };
 
 export const ActivitySection = () => {
     return (
         <>
-            <ActivityType1
-                user="USER"
-                action="checked in a project"
-                projectName="NAME"
-                timestamp="07/23/2025 8:30AM"
-            />
-            <ActivityType1
-                user="USER"
-                action="checked in a project"
-                projectName="NAME"
-                timestamp="07/23/2025 8:30AM"
-            />
-            <ActivityType1
-                user="USER"
-                action="checked in a project"
-                projectName="NAME"
-                timestamp="07/23/2025 8:30AM"
-            />
-            <ActivityType3
-                user="USER"
-                action="checked in a project"
-                projectName="NAME"
-                timestamp="07/23/2025 8:30AM"
-                description="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum"
-            />
+            <div className='profileActivity'>
+                <ActivityType1
+                    user="USER"
+                    action="checked in a project"
+                    projectName="NAME"
+                    timestamp="07/23/2025 8:30AM"
+                />
+                <ActivityType1
+                    user="USER"
+                    action="checked in a project"
+                    projectName="NAME"
+                    timestamp="07/23/2025 8:30AM"
+                />
+                <ActivityType1
+                    user="USER"
+                    action="checked in a project"
+                    projectName="NAME"
+                    timestamp="07/23/2025 8:30AM"
+                />
+                <ActivityType3
+                    user="USER"
+                    action="checked in a project"
+                    projectName="NAME"
+                    timestamp="07/23/2025 8:30AM"
+                    description="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum"
+                />
+            </div>
         </>
     );
 };
@@ -113,15 +284,15 @@ export const FriendsSection = () => {
         <>
             <div className='friendsSection'>
                 <div className="friendInput">
-                    <input type="text" placeholder="addFriend" />
+                    <input type="text" placeholder="Add a Friend" />
                     <button>+</button>
                 </div>
+                <div className='hLine'></div>
                 <div className='friendsList'>
                     <Friend />
                     <Friend />
                     <Friend />
                 </div>
-                <div className='hLine'></div>
             </div>
         </>
     );
@@ -137,7 +308,7 @@ export const Friend = () => {
                 <p>Online</p>
             </div>
             <div className="vLine"></div>
-            <button>View</button>
+            <button><Link to="/profile">View</Link></button>
         </div>
     );
 };
@@ -145,15 +316,17 @@ export const Friend = () => {
 export const ProjectSection = () => {
     return (
         <div className='projectSection' >
-            <h2>Current Projects</h2>
+            <h2 className='heading3 '>Current Projects</h2>
 
             <div className='projectList'>
                 <CardMini />
                 <CardMini />
                 <CardMini />
+                <CardMini />
+                <CardMini />
             </div>
-            <div className='hLine'></div>
-            <button>View Projects</button>
+            <div id='projSectLine' className='hLine'></div>
+            <button><Link to="/projects">View Projects</Link></button>
         </div>
     )
 }
