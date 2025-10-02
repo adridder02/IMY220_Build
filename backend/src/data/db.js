@@ -1,29 +1,58 @@
 export let users = [
-  { 
-    id: 1, 
-    email: "user1@example.com", 
-    password: "password123", 
-    firstName: "Alice", 
+  {
+    id: 1,
+    email: "user1@example.com",
+    password: "password123",
+    firstName: "Alice",
     lastName: "Smith",
     organization: "Example Corp",
     about: "Software engineer passionate about web apps.",
     phone: "123-456-7890",
     dob: "1990-01-01",
-    country: "USA"
+    country: "USA",
+    friends: [2] // Bob is Alice's friend
   },
-  { 
-    id: 2, 
-    email: "user2@example.com", 
-    password: "password456", 
-    firstName: "Bob", 
+  {
+    id: 2,
+    email: "user2@example.com",
+    password: "password456",
+    firstName: "Bob",
     lastName: "Jones",
     organization: "Tech Inc",
     about: "Mobile dev expert.",
     phone: "987-654-3210",
     dob: "1985-05-15",
-    country: "Canada"
+    country: "Canada",
+    friends: [1] // Alice is Bob's friend
   },
+  {
+    id: 3,
+    email: "user3@example.com",
+    password: "password789",
+    firstName: "Charlie",
+    lastName: "Brown",
+    organization: "Design Studio",
+    about: "Graphic designer and illustrator.",
+    phone: "555-123-4567",
+    dob: "1992-09-21",
+    country: "UK",
+    friends: [] // No friends
+  },
+  {
+    id: 4,
+    email: "user4@example.com",
+    password: "password321",
+    firstName: "Diana",
+    lastName: "Prince",
+    organization: "Heroics Ltd",
+    about: "Project manager with a love for technology.",
+    phone: "444-987-6543",
+    dob: "1988-12-12",
+    country: "Australia",
+    friends: [1, 2] // Friends with Alice and Bob
+  }
 ];
+
 
 export let projects = [
   {

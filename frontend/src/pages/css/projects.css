@@ -321,6 +321,11 @@ p {
 
 }
 
+.cardBack p {
+    border-top: none;
+    padding: 2.5vw 0;
+}
+
 /* Card Buttons */
 .cards button {
     border-radius: 30px;

@@ -52,7 +52,7 @@ export const ViewMembers = ({ members = [] }) => {
                         <p>{member.email}</p>
                     </div>
                     <div className="vLine"></div>
-                    <button>View</button>
+                    <button>Manage</button>
                 </div>
             ))}
         </div>
