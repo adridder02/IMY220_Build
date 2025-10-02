@@ -1,38 +1,39 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import './css/view.css';
 import { useParams } from 'react-router-dom';
 import { ViewActivity, ViewProject } from '../components/ViewComponents';
+import { UserContext } from '../Session';
 
 const ProjectViewPage = () => {
     const { id } = useParams();
+    const { user } = useContext(UserContext);
     const [activeView, setActiveView] = useState('Proj');
     const [project, setProject] = useState(null);
     const [activities, setActivities] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    // Fetch project data
+    // fetch project by ID
     useEffect(() => {
         const fetchProject = async () => {
             try {
-                const response = await fetch('/api/projects');
-                if (!response.ok) throw new Error('Failed to fetch projects');
+                const response = await fetch(`/api/projects/${id}`);
+                if (!response.ok) throw new Error('Project not found');
                 const data = await response.json();
-                const proj = data.find(p => p.id === parseInt(id));
-                if (!proj) throw new Error('Project not found');
-                setProject(proj);
+                setProject(data);
             } catch (err) {
                 console.error(err);
                 setError(err.message);
+            } finally {
+                setLoading(false);
             }
         };
         fetchProject();
     }, [id]);
 
-    // Fetch activities for this project
+    // fetch activities for this project
     useEffect(() => {
         if (!project) return;
-
         const fetchActivities = async () => {
             try {
                 const params = new URLSearchParams({ project: project.name, sort: 'date-desc' });
@@ -43,8 +44,6 @@ const ProjectViewPage = () => {
             } catch (err) {
                 console.error(err);
                 setActivities([]);
-            } finally {
-                setLoading(false);
             }
         };
         fetchActivities();
@@ -60,23 +59,13 @@ const ProjectViewPage = () => {
         <div className='view-container' id={activeView === 'Proj' ? 'project-view' : 'activity-view'}>
             <div className='menu'>
                 <h3 className="heading3">Menu</h3>
-                <button
-                    className={activeView === 'Proj' ? 'active' : ''}
-                    onClick={() => handleButtonClick('Proj')}
-                >
-                    Proj
-                </button>
-                <button
-                    className={activeView === 'Actv' ? 'active' : ''}
-                    onClick={() => handleButtonClick('Actv')}
-                >
-                    Actv
-                </button>
+                <button className={activeView === 'Proj' ? 'active' : ''} onClick={() => handleButtonClick('Proj')}>Proj</button>
+                <button className={activeView === 'Actv' ? 'active' : ''} onClick={() => handleButtonClick('Actv')}>Actv</button>
                 <div className='hLine'></div>
                 <button onClick={() => window.history.back()}>Back</button>
             </div>
 
-            {activeView === 'Proj' && <ViewProject project={project} />}
+            {activeView === 'Proj' && <ViewProject project={project} userEmail={user?.email} />}
             {activeView === 'Actv' && <ViewActivity project={project} activities={activities} />}
         </div>
     );

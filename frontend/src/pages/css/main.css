@@ -285,6 +285,7 @@ footer img {
 /*Search Bar*/
 
 #searchBar {
+    position: relative;
     width: 26vw;
     display: flex;
     flex-direction: row;
@@ -308,4 +309,20 @@ div#searchBar input {
     color: var(--primary) !important;
     font-size: 16px;
 
+}
+
+div#searchBar ul.suggestionsList {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    background-color: green;
+}
+
+div#searchBar ul.suggestionsList li {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    background-color: blue;
 }

@@ -16,7 +16,7 @@ const CardGrid = ({ projects, userEmail, onDeleteProject }) => {
                     side={flipped[project.id] ? 'back' : 'front'}
                     projectId={project.id}
                     projectName={project.name}
-                    tags={project.tags.join(' #')}
+                    tags={project.tags.map(tag => `#${tag}`).join(' ')}
                     description={project.description}
                     owner={project.owner}
                     checkedOutBy={project.checkedOutBy}

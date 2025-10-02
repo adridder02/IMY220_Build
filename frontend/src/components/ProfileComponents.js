@@ -277,7 +277,6 @@ export const FriendsSection = ({ friends, setFriends, profileId, currentUserId }
 
     const isOwner = profileId === currentUserId; // only the owner can edit
 
-    // handle input change only if owner
     const handleInputChange = (e) => {
         if (!isOwner) return;
 
@@ -325,7 +324,7 @@ export const FriendsSection = ({ friends, setFriends, profileId, currentUserId }
         if (!isOwner) return;
         if (!window.confirm("Are you sure you want to remove this friend?")) return;
 
-        setFriends(prev => prev.filter(f => f.id !== friendId)); // optimistic UI
+        setFriends(prev => prev.filter(f => f.id !== friendId)); 
 
         try {
             const res = await fetch(`/api/users/${profileId}/friends/${friendId}`, {

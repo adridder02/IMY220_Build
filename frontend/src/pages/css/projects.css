@@ -321,9 +321,8 @@ p {
 
 }
 
-.cardBack p:first-of-type {
-    border-top: none;
-    padding: 2.5vw 0;
+.cardBack h2 {
+    padding: 1vw 0;
 }
 
 /* Card Buttons */

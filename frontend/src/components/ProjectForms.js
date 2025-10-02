@@ -138,7 +138,6 @@ export const CreateProject = ({ onClose, onProjectCreated }) => {
                     </div>
 
                     <div id="buttonContainer">
-                        <button onClick={onClose} type="button">Cancel</button>
                         <button type="submit" className="submit">Confirm</button>
                     </div>
                 </form>
@@ -210,7 +209,6 @@ export const CheckInProject = ({ projectId, onClose }) => {
                         </div>
                     </div>
                     <div id="buttonContainer">
-                        <button onClick={onClose}>Cancel</button>
                         <button type="submit" className="submit">Check In</button>
                     </div>
                 </form>

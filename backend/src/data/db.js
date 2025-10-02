@@ -10,7 +10,7 @@ export let users = [
     phone: "123-456-7890",
     dob: "1990-01-01",
     country: "USA",
-    friends: [2] // Bob is Alice's friend
+    friends: [2]
   },
   {
     id: 2,
@@ -23,7 +23,7 @@ export let users = [
     phone: "987-654-3210",
     dob: "1985-05-15",
     country: "Canada",
-    friends: [1] // Alice is Bob's friend
+    friends: [1]
   },
   {
     id: 3,
@@ -36,7 +36,7 @@ export let users = [
     phone: "555-123-4567",
     dob: "1992-09-21",
     country: "UK",
-    friends: [] // No friends
+    friends: []
   },
   {
     id: 4,
@@ -49,7 +49,7 @@ export let users = [
     phone: "444-987-6543",
     dob: "1988-12-12",
     country: "Australia",
-    friends: [1, 2] // Friends with Alice and Bob
+    friends: [1, 2]
   }
 ];
 
@@ -60,7 +60,7 @@ export let projects = [
     name: "Project1",
     type: "Web App",
     description: "A web application",
-    tags: ["web", "react"],
+    tags: ["css", "react"],
     image: "project1.jpg",
     files: ["file1.js"],
     version: "1.0.0",
@@ -69,7 +69,7 @@ export let projects = [
       { email: "user1@example.com", name: "Alice Smith" },
       { email: "user2@example.com", name: "Bob Jones" },
     ],
-    checkedOutBy: null, // NEW (null = checked in)
+    checkedOutBy: null,
     versionHistory: [{ version: "1.0.0", description: "Initial release", date: "2025-09-01" }],
   },
   {
@@ -77,7 +77,7 @@ export let projects = [
     name: "Project2",
     type: "Mobile App",
     description: "A mobile application",
-    tags: ["mobile", "flutter"],
+    tags: ["html", "flutter"],
     image: "project2.jpg",
     files: ["file2.dart"],
     version: "1.0.0",
@@ -91,7 +91,7 @@ export let projects = [
     name: "Project3",
     type: "Web App",
     description: "Another web app",
-    tags: ["web", "node"],
+    tags: ["react", "node"],
     image: "project3.jpg",
     files: ["file3.js"],
     version: "1.0.0",
@@ -143,4 +143,65 @@ export let activities = [
     timestamp: "2025-09-03",
     description: "Bob edited Project3",
   },
+  {
+    id: 5,
+    actionType: "comment",
+    user: "Charlie Brown",
+    email: "user3@example.com",
+    action: "commented on a project",
+    projectName: "Project2",
+    timestamp: "2025-09-04",
+    description: "Charlie left a comment on Project2 suggesting UI improvements",
+  },
+  {
+    id: 6,
+    actionType: "join",
+    user: "Diana Prince",
+    email: "user4@example.com",
+    action: "joined a project",
+    projectName: "Project1",
+    timestamp: "2025-09-05",
+    description: "Diana joined Project1 as a project manager",
+  },
+  {
+    id: 7,
+    actionType: "checkout",
+    user: "Bob Jones",
+    email: "user2@example.com",
+    action: "checked out a project",
+    projectName: "Project3",
+    timestamp: "2025-09-06",
+    description: "Bob checked out Project3 for updates",
+  },
+  {
+    id: 8,
+    actionType: "update",
+    user: "Alice Smith",
+    email: "user1@example.com",
+    action: "updated project files",
+    projectName: "Project2",
+    timestamp: "2025-09-07",
+    description: "Alice updated the mobile app files in Project2",
+  },
+  {
+    id: 9,
+    actionType: "comment",
+    user: "Diana Prince",
+    email: "user4@example.com",
+    action: "commented on a project",
+    projectName: "Project3",
+    timestamp: "2025-09-08",
+    description: "Diana suggested adding a new feature to Project3",
+  },
+  {
+    id: 10,
+    actionType: "checkin",
+    user: "Charlie Brown",
+    email: "user3@example.com",
+    action: "checked in a project",
+    projectName: "Project2",
+    timestamp: "2025-09-09",
+    description: "Charlie contributed new design assets to Project2",
+  }
 ];
+
