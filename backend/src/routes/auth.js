@@ -1,60 +1,48 @@
 import express from "express";
-import { users } from "../data/db.js";
+import { ObjectId } from "mongodb";
 
-const router = express.Router();
+export default function authRoutes(db) {
+  const router = express.Router();
+  const usersCollection = db.collection("users");
 
-// register endpoint
-router.post("/register", (req, res) => {
-  const { email, password, confpassword, name } = req.body;
+  // REGISTER
+  router.post("/register", async (req, res) => {
+    const { email, password, confpassword, firstName, lastName } = req.body;
+    const missing = [];
+    if (!email) missing.push("email");
+    if (!password) missing.push("password");
+    if (!confpassword) missing.push("confpassword");
+    if (!firstName) missing.push("firstName");
+    if (!lastName) missing.push("lastName");
+    if (missing.length) return res.status(400).json({ error: `Missing fields: ${missing.join(", ")}` });
 
-  // check for missing fields
-  const missingFields = [];
-  if (!email) missingFields.push("email");
-  if (!password) missingFields.push("password");
-  if (!confpassword) missingFields.push("confpassword");
-  if (!name) missingFields.push("name");
-  if (missingFields.length > 0) {
-    return res.status(400).json({ error: `Missing required fields: ${missingFields.join(", ")}` });
-  }
+    if (password !== confpassword) return res.status(400).json({ error: "Passwords do not match" });
+    if (await usersCollection.findOne({ email: email.toLowerCase() })) return res.status(400).json({ error: "Email already registered" });
 
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email)) {
-    return res.status(400).json({ error: "Invalid email format" });
-  }
+    const result = await usersCollection.insertOne({
+      email: email.toLowerCase(),
+      password,
+      firstName,
+      lastName,
+      friends: [],
+    });
 
-  if (password.length < 6) {
-    return res.status(400).json({ error: "Password must be at least 6 characters" });
-  }
-
-  if (password !== confpassword) {
-    return res.status(400).json({ error: "Passwords do not match" });
-  }
-
-  if (users.find((user) => user.email === email)) {
-    return res.status(400).json({ error: "Email already registered" });
-  }
-
-  users.push({ email, password, name });
-  res.status(201).json({ message: "Registration successful" });
-});
-
-// login endpoint
-router.post("/login", (req, res) => {
-  const { email, password } = req.body;
-
-  if (!email || !password) {
-    return res.status(400).json({ error: `Missing required fields: ${!email ? "email" : ""}${!email && !password ? ", " : ""}${!password ? "password" : ""}` });
-  }
-
-  const user = users.find((u) => u.email === email && u.password === password);
-  if (!user) {
-    return res.status(401).json({ error: "Invalid email or password" });
-  }
-
-  res.json({
-    message: "Login successful",
-    user: { id: user.id, email: user.email, name: user.firstName }
+    res.status(201).json({ message: "Registration successful", userId: result.insertedId });
   });
-});
 
-export default router;
+  // LOGIN
+  router.post("/login", async (req, res) => {
+    const { email, password } = req.body;
+    if (!email || !password) return res.status(400).json({ error: "Email and password required" });
+
+    const user = await usersCollection.findOne({ email: email.toLowerCase(), password });
+    if (!user) return res.status(401).json({ error: "Invalid email or password" });
+
+    res.json({
+      message: "Login successful",
+      user: { id: user._id, email: user.email, firstName: user.firstName, lastName: user.lastName }
+    });
+  });
+
+  return router;
+}
