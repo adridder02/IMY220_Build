@@ -64,10 +64,12 @@ export let projects = [
     image: "project1.jpg",
     files: ["file1.js"],
     version: "1.0.0",
+    owner: { email: "user2@example.com", name: "Bob Jones" },
     members: [
       { email: "user1@example.com", name: "Alice Smith" },
       { email: "user2@example.com", name: "Bob Jones" },
     ],
+    checkedOutBy: null, // NEW (null = checked in)
     versionHistory: [{ version: "1.0.0", description: "Initial release", date: "2025-09-01" }],
   },
   {
@@ -79,7 +81,9 @@ export let projects = [
     image: "project2.jpg",
     files: ["file2.dart"],
     version: "1.0.0",
+    owner: { email: "user1@example.com", name: "Alice Smith" },
     members: [{ email: "user1@example.com", name: "Alice Smith" }],
+    checkedOutBy: null,
     versionHistory: [{ version: "1.0.0", description: "Initial release", date: "2025-09-02" }],
   },
   {
@@ -91,7 +95,9 @@ export let projects = [
     image: "project3.jpg",
     files: ["file3.js"],
     version: "1.0.0",
+    owner: { email: "user2@example.com", name: "Bob Jones" },
     members: [{ email: "user2@example.com", name: "Bob Jones" }],
+    checkedOutBy: null,
     versionHistory: [{ version: "1.0.0", description: "Initial release", date: "2025-09-03" }],
   },
 ];

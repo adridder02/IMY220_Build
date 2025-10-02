@@ -154,6 +154,15 @@
 
 }
 
+.viewMembers input {
+    all: unset;
+    border-radius: 20px;
+    padding: 5% 1%;
+    background-color: var(--primary);
+    font-size: 18px;
+    padding-left: 1.5vw;
+    color: var(--secondary);
+}
 
 /*Version History*/
 .leftSect .versionHistory {
@@ -286,7 +295,7 @@
     width: 15vw;
     font-size: 1.5rem;
     border-color: var(--accent);
-} 
+}
 
 .view-container#project-view .barButtons .checkIn:hover {
     border: var(--secondary);

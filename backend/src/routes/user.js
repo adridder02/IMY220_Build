@@ -15,19 +15,14 @@ router.get("/user", (req, res) => {
 });
 
 // update user profile
-router.put("/user", (req, res) => {
-    const { email, firstName, lastName, phone, dob, country, organization, about } = req.body;
-    if (!email) return res.status(400).json({ error: "Email required" });
+router.put("/users/:id", (req, res) => {
+    const { id } = req.params;
+    const { firstName, lastName, phone, dob, country, organization, about, email } = req.body;
 
-    // Find the user to update
-    const user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
+    const user = users.find(u => u.id === parseInt(id));
     if (!user) return res.status(404).json({ error: "User not found" });
 
-    // Ensure only the owner can update
-    if (req.user.email.toLowerCase() !== email.toLowerCase()) {
-        return res.status(403).json({ error: "Forbidden: cannot edit another user's profile" });
-    }
-
+    // update fields
     if (firstName !== undefined) user.firstName = firstName;
     if (lastName !== undefined) user.lastName = lastName;
     if (phone !== undefined) user.phone = phone;
@@ -38,6 +33,7 @@ router.put("/user", (req, res) => {
 
     res.json({ message: "Profile updated", user });
 });
+
 
 
 // get user by ID
@@ -66,10 +62,8 @@ router.get("/users/:id/friends", (req, res) => {
     const user = users.find(u => u.id === parseInt(id));
     if (!user) return res.status(404).json({ error: "User not found" });
 
-    // Ensure friends are always returned in full object shape
     const friendsList = (user.friends || []).map(f => {
         if (typeof f === "number") {
-            // legacy: friend stored as ID only
             const friendUser = users.find(u => u.id === f);
             return friendUser
                 ? {
@@ -82,7 +76,6 @@ router.get("/users/:id/friends", (req, res) => {
                 }
                 : null;
         }
-        // already an object
         return f;
     }).filter(Boolean);
 
@@ -161,7 +154,6 @@ router.delete("/users/:id/friends/:friendId", (req, res) => {
         return fid !== parseInt(friendId);
     });
 
-    // normalize friends to full objects for frontend
     const friendsList = user.friends.map(f => {
         if (typeof f === 'number') {
             const friendUser = users.find(u => u.id === f);
@@ -179,7 +171,6 @@ router.delete("/users/:id", (req, res) => {
     const userIndex = users.findIndex(u => u.id === parseInt(id));
     if (userIndex === -1) return res.status(404).json({ error: "User not found" });
 
-    // Remove user from all friends lists
     users.forEach(u => {
         if (u.friends) {
             u.friends = u.friends.filter(f => {

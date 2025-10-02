@@ -47,7 +47,7 @@ const ProfilePage = () => {
 
     const isOwner = user?.id === parseInt(id);
 
-    // Fetch profile by ID
+    // fetch profile by id
     useEffect(() => {
         const fetchProfile = async () => {
             if (!id) return;
@@ -76,7 +76,7 @@ const ProfilePage = () => {
         fetchProfile();
     }, [id]);
 
-    // Fetch activities, projects, friends after email is loaded
+    // fetch activities, projects, friends after email is loaded
     useEffect(() => {
         if (!profileData.email) return;
 
@@ -137,13 +137,14 @@ const ProfilePage = () => {
 
         if (activeSection === 'Edit') {
             try {
-                const res = await fetch('/api/user', {
+                const res = await fetch(`/api/users/${user.id}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
+                        id: user.id,
+                        name: profileData.name,
+                        surname: profileData.surname,
                         email: profileData.email,
-                        firstName: profileData.name,
-                        lastName: profileData.surname,
                         phone: profileData.phone,
                         dob: profileData.dob,
                         country: profileData.country,
@@ -151,6 +152,7 @@ const ProfilePage = () => {
                         about: profileData.about,
                     }),
                 });
+
                 if (!res.ok) throw new Error('Failed to update profile');
                 const data = await res.json();
                 console.log('Profile updated', data);
@@ -163,6 +165,7 @@ const ProfilePage = () => {
             setActiveSection('Edit');
         }
     };
+
 
     const handleDeleteProfile = async () => {
         if (!isOwner) return;

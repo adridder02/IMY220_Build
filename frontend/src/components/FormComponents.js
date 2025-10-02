@@ -98,19 +98,33 @@ export const AddFiles = ({ files, onAddFile }) => {
                     />
                     <button type="button" onClick={handleAdd}>+</button>
                 </div>
+
                 <div className="uploadButton">
-                    <button type="button">Upload File</button>
-                    <img src="assets/img/placeholder.png" alt="UploadFile Symbol" />
+                    <label>
+                        Upload File
+                        <input
+                            type="file"
+                            style={{ display: 'none' }}
+                            onChange={(e) => {
+                                const file = e.target.files[0];
+                                if (file) onAddFile(file);
+                            }}
+                        />
+                    </label>
+                    <img src="/assets/img/placeholder.png" alt="UploadFile Symbol" />
                 </div>
+
                 <div className="fileList">
                     {files.map((file, index) => (
-                        <p key={index}>{file}</p>
+                        <p key={index}>{file.name || file}</p>
                     ))}
                 </div>
             </div>
         </div>
     );
 };
+
+
 
 export const Version = ({ value, onChange }) => {
     return (
@@ -124,26 +138,20 @@ export const Version = ({ value, onChange }) => {
 export const Member = ({ email, name }) => {
     return (
         <div className="member">
-            <img src="assets/img/placeholder.png" alt="userPfp" className="avatar" />
+            <img src="/assets/img/placeholder.png" alt="userPfp" className="avatar" />
             <div className="userInfo">
                 <p>{name}</p>
                 <div className="hLine"></div>
                 <p>{email}</p>
             </div>
             <div className="vLine"></div>
-            <button>View</button>
+            <button className='removeMember'>-</button>
         </div>
     );
 };
 
-export const ManageMembers = ({ members, onAddMember }) => {
-    const [memberInput, setMemberInput] = React.useState('');
-
-    const handleAdd = () => {
-        if (memberInput.trim()) {
-            onAddMember(memberInput.trim());
-            setMemberInput('');
-        }
+export const ManageMembers = ({ members, onPromote }) => {
+    const handlePromote = () => {
     };
 
     return (
@@ -153,11 +161,9 @@ export const ManageMembers = ({ members, onAddMember }) => {
                 <div className="memberInput">
                     <input
                         type="text"
-                        placeholder="Add Members"
-                        value={memberInput}
-                        onChange={(e) => setMemberInput(e.target.value)}
+                        placeholder="New Owner"
                     />
-                    <button type="button" onClick={handleAdd}>+</button>
+                    <button type="button" onClick={handlePromote}>&#x2713;</button>
                 </div>
                 <div className="memberList">
                     {members.map((email, index) => (

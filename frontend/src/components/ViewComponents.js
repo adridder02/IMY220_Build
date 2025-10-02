@@ -3,7 +3,7 @@ import Activities from "./Activities";
 import { CheckInProject, EditProject } from "./ProjectForms";
 
 export const ViewActivity = ({ project, activities = [] }) => {
-    const [activeView, setActiveView] = useState('hist');
+    const [activeView, setActiveView] = useState('mem');
 
     const toggleLeft = () => {
         setActiveView(prev => (prev === "mem" ? "hist" : "mem"));
@@ -39,6 +39,13 @@ export const ViewMembers = ({ members = [] }) => {
     return (
         <div className="viewMembers">
             <h3 className="heading3">Member List</h3>
+            <div className="memberInput">
+                <input
+                    type="text"
+                    placeholder="Add Members"
+                />
+                <button type="button">+</button>
+            </div>
             {members.map((member, idx) => (
                 <div className="member" key={idx}>
                     <img
@@ -52,7 +59,7 @@ export const ViewMembers = ({ members = [] }) => {
                         <p>{member.email}</p>
                     </div>
                     <div className="vLine"></div>
-                    <button>Manage</button>
+                    <button>View</button>
                 </div>
             ))}
         </div>

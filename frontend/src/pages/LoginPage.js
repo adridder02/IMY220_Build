@@ -32,7 +32,6 @@ const LoginPage = () => {
                 throw new Error(data.error || 'Login failed');
             }
             console.log('Login response:', data.user); // debug
-            // include id so profile nav works
             setUser({ id: data.user.id, email: data.user.email, name: data.user.name });
             navigate('/home');
         } catch (err) {

@@ -23,9 +23,11 @@ const ProjectsPage = () => {
     fetchProjects();
   }, [scope, sort, user]);
 
-  if (!user) {
-    return <div>Please log in to view projects.</div>;
-  }
+  const handleDeleteProject = (projectId) => {
+    setProjects(prev => prev.filter(p => p.id !== projectId));
+  };
+
+  if (!user) return <div>Please log in to view projects.</div>;
 
   return (
     <>
@@ -51,11 +53,16 @@ const ProjectsPage = () => {
             </div>
             <Sort onChange={(e) => setSort(e.target.value)} />
           </div>
-          <CardGrid projects={projects} userEmail={user.email} />
+          <CardGrid
+            projects={projects}
+            userEmail={user.email}
+            onDeleteProject={handleDeleteProject}
+          />
         </div>
       )}
     </>
   );
 };
+
 
 export default ProjectsPage;

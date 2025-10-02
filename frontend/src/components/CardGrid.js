@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import ProjectCards from './ProjectCards';
 
-const CardGrid = ({ projects }) => {
-    const [flipped, setFlipped] = useState({}); // track side
+const CardGrid = ({ projects, userEmail, onDeleteProject }) => {
+    const [flipped, setFlipped] = useState({});
 
     const handleFlip = (projectId) => {
         setFlipped((prev) => ({ ...prev, [projectId]: !prev[projectId] }));
@@ -18,8 +18,14 @@ const CardGrid = ({ projects }) => {
                     projectName={project.name}
                     tags={project.tags.join(' #')}
                     description={project.description}
+                    owner={project.owner}
+                    checkedOutBy={project.checkedOutBy}
+                    userEmail={userEmail}
                     onFlip={() => handleFlip(project.id)}
+                    onDeleteProject={onDeleteProject}
+                    members={project.members}
                 />
+
             ))}
         </div>
     );

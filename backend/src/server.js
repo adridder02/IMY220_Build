@@ -5,6 +5,8 @@ import authRoutes from "./routes/auth.js";
 import projectRoutes from "./routes/projects.js";
 import activityRoutes from "./routes/activities.js";
 import userRoutes from "./routes/user.js";
+import fileRoutes from "./routes/files.js";
+
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -21,6 +23,7 @@ app.use("/api", authRoutes);
 app.use("/api", projectRoutes);
 app.use("/api", activityRoutes);
 app.use("/api", userRoutes);
+app.use("/api", fileRoutes);
 
 
 // for all routes
