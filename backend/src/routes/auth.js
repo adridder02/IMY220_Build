@@ -1,5 +1,4 @@
 import express from "express";
-import { ObjectId } from "mongodb";
 
 export default function authRoutes(db) {
   const router = express.Router();
@@ -17,14 +16,16 @@ export default function authRoutes(db) {
     if (missing.length) return res.status(400).json({ error: `Missing fields: ${missing.join(", ")}` });
 
     if (password !== confpassword) return res.status(400).json({ error: "Passwords do not match" });
-    if (await usersCollection.findOne({ email: email.toLowerCase() })) return res.status(400).json({ error: "Email already registered" });
+    if (await usersCollection.findOne({ email: email.toLowerCase() }))
+      return res.status(400).json({ error: "Email already registered" });
 
     const result = await usersCollection.insertOne({
+      id: Date.now(), // numeric ID
       email: email.toLowerCase(),
       password,
       firstName,
       lastName,
-      friends: [],
+      friends: []
     });
 
     res.status(201).json({ message: "Registration successful", userId: result.insertedId });
@@ -40,7 +41,11 @@ export default function authRoutes(db) {
 
     res.json({
       message: "Login successful",
-      user: { id: user._id, email: user.email, firstName: user.firstName, lastName: user.lastName }
+      user: {
+        id: user._id,
+        email: user.email,
+        name: `${user.firstName} ${user.lastName}`
+      }
     });
   });
 

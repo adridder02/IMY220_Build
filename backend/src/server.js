@@ -32,11 +32,11 @@ async function startServer() {
 
     const db = client.db("IMY220_Project"); 
 
-    app.use("/api/auth", authRoutes(db));
+    app.use("/api", authRoutes(db)); 
     app.use("/api/users", userRoutes(db));
     app.use("/api/projects", projectRoutes(db));
     app.use("/api/activities", activityRoutes(db));
-    app.use("/api/files", fileRoutes(db)); 
+    app.use("/api", fileRoutes);
 
     app.get("/*", (req, res) => {
       res.sendFile(path.join(__dirname, "../../frontend/public", "index.html"));

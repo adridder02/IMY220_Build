@@ -3,8 +3,8 @@ import express from "express";
 export default function activityRoutes(db) {
   const router = express.Router();
   const activitiesCollection = db.collection("activities");
-  const projectsCollection = db.collection("projects");
 
+  // GET all activities
   router.get("/", async (req, res) => {
     try {
       const { scope, email, project, search, sort } = req.query;
@@ -24,7 +24,7 @@ export default function activityRoutes(db) {
 
       let activities = await activitiesCollection.find(query).toArray();
 
-      // sort
+      // Sorting
       if (sort) {
         if (sort === "date-desc") activities.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
         if (sort === "date-asc") activities.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));

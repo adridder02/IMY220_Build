@@ -1,6 +1,5 @@
 {
   "name": "imy220-d1",
-  "type": "module",
   "version": "1.0.0",
   "main": "server.js",
   "dependencies": {
