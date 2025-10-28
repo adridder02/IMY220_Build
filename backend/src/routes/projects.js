@@ -9,11 +9,22 @@ export default function projectRoutes(db) {
 
   // Helper function to create activity
   const createActivity = async (actionType, userName, email, projectName, description) => {
+    const verb =
+      actionType === "create" ? "created" :
+        actionType === "delete" ? "deleted" :
+          actionType === "checkin" ? "checked in" :
+            actionType === "checkout" ? "checked out" :
+              actionType === "join" ? "joined" :
+                actionType === "comment" ? "commented on" :
+                  actionType === "update" ? "updated" :
+                    actionType === "promote" ? "promoted to owner of" :
+                      "performed an action on";
+
     await activitiesCollection.insertOne({
       actionType,
       user: userName,
       email,
-      action: `${actionType === "create" ? "created" : actionType === "delete" ? "deleted" : actionType === "checkin" ? "checked in" : actionType === "checkout" ? "checked out" : actionType === "join" ? "joined" : actionType === "comment" ? "commented on" : "updated"} a project`,
+      action: `${verb} a project`,
       projectName,
       timestamp: new Date().toISOString(),
       description,
@@ -74,7 +85,7 @@ export default function projectRoutes(db) {
         image: image || "/assets/img/placeholder.png",
         files: files || [],
         version,
-        owner: { _id: ownerUser._id, name: userName },
+        owner: { _id: ownerUser._id, name: userName, email: ownerUser.email },
         members: membersDetails.map(u => ({
           _id: u._id,
           name: `${u.firstName} ${u.lastName}`,
@@ -187,7 +198,7 @@ export default function projectRoutes(db) {
         userName,
         userEmail,
         project.name,
-        `${userName} checked in updates to ${project.name}`
+        description
       );
 
       res.json({ message: "Project checked in", project: updatedProject });
@@ -238,22 +249,38 @@ export default function projectRoutes(db) {
   });
 
   // PUT update project
+  // PUT update project – respects member order (first = owner)
   router.put("/:id", async (req, res) => {
     try {
       const id = req.params.id;
-      if (!ObjectId.isValid(id)) return res.status(400).json({ error: "Invalid project ID" });
+      if (!ObjectId.isValid(id))
+        return res.status(400).json({ error: "Invalid project ID" });
 
       const { name, type, description, tags, image, files, version, members } = req.body;
-      if (!name || !type || !description || !version || !members?.length) {
+
+      // Validate required fields
+      if (!name || !type || !description || !version || !Array.isArray(members) || members.length === 0) {
         return res.status(400).json({ error: "Missing required fields" });
       }
 
-      const membersDetails = await usersCollection.find({ email: { $in: members } }).toArray();
-      if (!membersDetails.length) return res.status(400).json({ error: "Members not found" });
+      // Fetch all users in the exact order of the incoming emails
+      const membersDetails = await usersCollection
+        .find({ email: { $in: members } })
+        .toArray();
 
-      const ownerUser = membersDetails[0];
-      const userName = `${ownerUser.firstName} ${ownerUser.lastName}`;
+      if (membersDetails.length !== members.length) {
+        return res.status(400).json({ error: "One or more members not found" });
+      }
 
+      // Re-order user docs to match the incoming email order
+      const orderedMembers = members.map(email =>
+        membersDetails.find(u => u.email === email)
+      );
+
+      const ownerUser = orderedMembers[0];
+      const ownerName = `${ownerUser.firstName} ${ownerUser.lastName}`;
+
+      // Build updated project
       const updatedProject = {
         name,
         type,
@@ -262,16 +289,28 @@ export default function projectRoutes(db) {
         image: image || "/assets/img/placeholder.png",
         files: files || [],
         version,
-        owner: { _id: ownerUser._id, name: userName },
-        members: membersDetails.map(u => ({
+        owner: {
+          _id: ownerUser._id,
+          name: ownerName,
+          email: ownerUser.email,
+        },
+        members: orderedMembers.map(u => ({
           _id: u._id,
           name: `${u.firstName} ${u.lastName}`,
           email: u.email,
         })),
         checkedOutBy: null,
         versionHistory: [
-          { version, description, date: new Date().toISOString(), modifiedBy: userName },
-          ...(await projectsCollection.findOne({ _id: new ObjectId(id) }).then(p => p.versionHistory || [])),
+          {
+            version,
+            description: `Updated project (version ${version})`,
+            date: new Date().toISOString(),
+            modifiedBy: ownerName,
+          },
+          // Prepend to existing history
+          ...(await projectsCollection
+            .findOne({ _id: new ObjectId(id) })
+            .then(p => p?.versionHistory || [])),
         ],
       };
 
@@ -280,17 +319,27 @@ export default function projectRoutes(db) {
         { $set: updatedProject }
       );
 
-      if (result.matchedCount === 0) return res.status(404).json({ error: "Project not found" });
+      if (result.matchedCount === 0)
+        return res.status(404).json({ error: "Project not found" });
+
+      // Activity: detect if owner changed
+      const oldProject = await projectsCollection.findOne({ _id: new ObjectId(id) });
+      const ownerChanged = oldProject.owner.email !== ownerUser.email;
 
       await createActivity(
         "update",
-        userName,
+        ownerName,
         ownerUser.email,
         updatedProject.name,
-        `${userName} updated ${updatedProject.name}`
+        ownerChanged
+          ? `${ownerName} updated ${updatedProject.name} and was promoted to owner`
+          : `${ownerName} updated ${updatedProject.name}`
       );
 
-      res.json({ message: "Project updated", project: { ...updatedProject, _id: id } });
+      res.json({
+        message: "Project updated",
+        project: { ...updatedProject, _id: id },
+      });
     } catch (err) {
       console.error("PUT /projects/:id failed:", err);
       res.status(500).json({ error: "Failed to update project" });

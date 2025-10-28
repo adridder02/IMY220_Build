@@ -297,7 +297,6 @@ form .tags,
 
 .memberList {
     min-height: 10vw;
-    border-top: 2px solid var(--secondary);
     padding: 1vw;
     font-family: General;
 
@@ -312,7 +311,7 @@ form .tags,
 }
 
 .members .userInfo {
-    margin-top: 7%;
+    margin-top: 3%;
 
 }
 
@@ -346,6 +345,11 @@ form .tags,
 .member:last-of-type {
     border-bottom: 0;
 
+}
+
+.memberOwner {
+    border-bottom: 2px solid var(--secondary);
+    padding: 1.5vw;
 }
 
 /*Version History*/

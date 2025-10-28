@@ -135,45 +135,74 @@ export const Version = ({ value, onChange }) => {
     );
 };
 
-export const Member = ({ email, name }) => {
+export const Member = ({ member, isOwner, onPromote, onRemove }) => {
     return (
         <div className="member">
-            <img src="/assets/img/placeholder.png" alt="userPfp" className="avatar" />
             <div className="userInfo">
-                <p>{name}</p>
+                <p>{member.name || `${member.firstName} ${member.lastName}`}</p>
                 <div className="hLine"></div>
-                <p>{email}</p>
+                <p>{member.email}</p>
             </div>
             <div className="vLine"></div>
-            <button className='removeMember'>-</button>
+            {isOwner ? (
+                <span className="ownerBadge">Owner</span>
+            ) : (
+                <div className="actions">
+                    <button className="promoteMember" onClick={onPromote}>Promote</button>
+                    <button className="removeMember" onClick={onRemove}>Remove</button>
+                </div>
+            )}
         </div>
     );
 };
 
-export const ManageMembers = ({ members, onPromote }) => {
-    const handlePromote = () => {
-    };
+
+export const ManageMembers = ({ members = [], onRemove, onPromote }) => {
+    if (!members || members.length === 0) {
+        return (
+            <div>
+                <label>Manage Members</label>
+                <div className="members">
+                    <h3 className="heading3">Members</h3>
+                    <p>No members found</p>
+                </div>
+            </div>
+        );
+    }
+
+    const owner = members[0];
+    const otherMembers = members.slice(1);
 
     return (
         <div>
             <label>Manage Members</label>
             <div className="members">
-                <div className="memberInput">
-                    <input
-                        type="text"
-                        placeholder="New Owner"
+                <div className="memberOwner">
+                    <Member
+                        key={owner.email}
+                        member={owner}
+                        isOwner={true}
+                        onPromote={() => { }}
+                        onRemove={() => { }}
                     />
-                    <button type="button" onClick={handlePromote}>&#x2713;</button>
                 </div>
                 <div className="memberList">
-                    {members.map((email, index) => (
-                        <Member key={index} email={email} name={email.split('@')[0]} />
+                    {otherMembers.map((member) => (
+                        <Member
+                            key={member.email}
+                            member={member}
+                            isOwner={false}
+                            onPromote={() => onPromote(member.email)}
+                            onRemove={() => onRemove(member.email)}
+                        />
                     ))}
                 </div>
             </div>
         </div>
     );
 };
+
+
 
 export const VersionHistory = ({ versionHistory }) => {
     return (

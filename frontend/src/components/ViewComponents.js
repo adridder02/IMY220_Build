@@ -32,6 +32,7 @@ export const ViewActivity = ({ project, activities = [] }) => {
                         setMembers={setProjectMembers}
                         profileId={user.id}
                         currentUserId={user.id}
+                        id={project._id}
                     />
                 )}
                 {activeView === 'hist' && (
@@ -90,13 +91,13 @@ export const ViewMembers = ({ members = [], setMembers, profileId, currentUserId
     };
 
     const handleAddMember = async (friend) => {
-        if (!project?.id) {
+        if (!id) {
             console.error("Project ID missing");
             return;
         }
 
         try {
-            const res = await fetch(`/api/projects/${project.id}/members`, {
+            const res = await fetch(`/api/projects/${id}/members`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email: friend.email }),
@@ -112,8 +113,6 @@ export const ViewMembers = ({ members = [], setMembers, profileId, currentUserId
             alert(err.message);
         }
     };
-
-
 
     return (
         <div className="viewMembers">
@@ -179,6 +178,9 @@ export const ViewProject = ({ project, userEmail }) => {
     const [commentError, setCommentError] = useState("");
     const isOwnerOrMember =
         project.owner?.email === userEmail || project.members?.some(m => m.email === userEmail);
+
+    const isOwner =
+        project.owner?.email === userEmail;
 
     const toggleRight = (view) => setActiveView(view);
 
@@ -261,7 +263,7 @@ export const ViewProject = ({ project, userEmail }) => {
                     </button>
                     <button onClick={handleDownload}>Dow</button>
                     <button onClick={() => toggleRight("chat")}>Chat</button>
-                    {isOwnerOrMember && (
+                    {isOwner && (
                         <button className="editButton" onClick={() => toggleRight("edit")}>
                             Edit
                         </button>

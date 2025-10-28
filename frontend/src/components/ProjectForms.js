@@ -247,7 +247,7 @@ export const CheckInProject = ({ projectId, userEmail, onCheckIn, onClose }) => 
     );
 };
 
-export const EditProject = ({ projectId, onClose }) => {
+export const EditProject = ({ projectId, onClose, onProjectUpdate }) => {
     const { user } = useContext(UserContext);
     const [formData, setFormData] = useState({
         name: '',
@@ -257,28 +257,37 @@ export const EditProject = ({ projectId, onClose }) => {
         image: '',
         files: [],
         version: '0.0.0',
-        members: [user?.email || 'user1@example.com'],
+        members: [],
     });
     const [error, setError] = useState('');
 
+    // Fetch project
     useEffect(() => {
         const fetchProject = async () => {
             try {
                 const response = await fetch(`/api/projects/${projectId}`);
                 if (!response.ok) throw new Error('Failed to fetch project');
                 const data = await response.json();
+
                 setFormData({
                     name: data.name,
                     type: data.type,
                     description: data.description,
-                    tags: data.tags,
-                    image: data.image,
-                    files: data.files,
+                    tags: data.tags || [],
+                    image: data.image || '',
+                    files: data.files || [],
                     version: data.version,
-                    members: data.members.map((m) => m.email),
+                    members: data.members.map(m => ({
+                        id: m._id?.toString(),
+                        firstName: m.name?.split(' ')[0] || '',
+                        lastName: m.name?.split(' ').slice(1).join(' ') || '',
+                        email: m.email,
+                        name: m.name,
+                        avatar: m.avatar,
+                    })),
                 });
             } catch (error) {
-                console.error('Error fetching project:', error);
+                console.error('Error:', error);
                 setError(error.message);
             }
         };
@@ -286,33 +295,59 @@ export const EditProject = ({ projectId, onClose }) => {
     }, [projectId]);
 
     const handleInputChange = (field, value) => {
-        setFormData((prev) => ({ ...prev, [field]: value }));
+        setFormData(prev => ({ ...prev, [field]: value }));
     };
 
     const handleAddTag = (tag) => {
-        setFormData((prev) => ({ ...prev, tags: [...prev.tags, tag] }));
+        if (tag && !formData.tags.includes(tag)) {
+            setFormData(prev => ({ ...prev, tags: [...prev.tags, tag] }));
+        }
     };
 
     const handleAddFile = (file) => {
-        setFormData((prev) => ({ ...prev, files: [...prev.files, file] }));
+        setFormData(prev => ({ ...prev, files: [...prev.files, file] }));
     };
 
     const handlePromote = (email) => {
+        setFormData((prev) => {
+            const members = [...prev.members];
+            const idx = members.findIndex((m) => m.email === email);
+            if (idx === -1 || idx === 0) return prev; // already owner
+
+            // Swap with owner (index 0)
+            [members[0], members[idx]] = [members[idx], members[0]];
+            return { ...prev, members };
+        });
+    };
+
+    const handleRemove = (email) => {
+        if (formData.members[0]?.email === email) return;
+        setFormData(prev => ({
+            ...prev,
+            members: prev.members.filter(m => m.email !== email)
+        }));
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
+
         try {
-            const response = await fetch(`/api/projects/${projectId}`, {
+            const payload = {
+                ...formData,
+                members: formData.members.map(m => m.email),
+            };
+
+            const res = await fetch(`/api/projects/${projectId}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(formData),
+                body: JSON.stringify(payload),
             });
-            const data = await response.json();
-            if (!response.ok) {
-                throw new Error(data.error || 'Failed to update project');
-            }
+
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || 'Failed to update');
+
+            onProjectUpdate?.(data.project);  // Refresh parent
             onClose();
         } catch (err) {
             setError(err.message);
@@ -327,6 +362,7 @@ export const EditProject = ({ projectId, onClose }) => {
                     <div className="close" onClick={onClose}>X</div>
                 </div>
                 <div className="timestamp">{new Date().toLocaleString()}</div>
+
                 <div className="uploadArea">
                     <input
                         type="file"
@@ -334,7 +370,9 @@ export const EditProject = ({ projectId, onClose }) => {
                         onChange={(e) => handleInputChange('image', e.target.files[0]?.name || '')}
                     />
                 </div>
+
                 {error && <p style={{ color: 'red' }}>{error}</p>}
+
                 <form onSubmit={handleSubmit}>
                     <div className="formContent">
                         <div className="leftCol">
@@ -346,11 +384,15 @@ export const EditProject = ({ projectId, onClose }) => {
                         <div className="rightCol">
                             <AddFiles files={formData.files} onAddFile={handleAddFile} />
                             <Version value={formData.version} onChange={(e) => handleInputChange('version', e.target.value)} />
-                            <ManageMembers members={formData.members} onPromote={handlePromote} />
+                            <ManageMembers
+                                members={formData.members}
+                                onPromote={handlePromote}
+                                onRemove={handleRemove}
+                            />
                         </div>
                     </div>
                     <div id="buttonContainer">
-                        <button>Delete</button>
+                        <button type="button">Delete</button>
                         <button type="submit" className="submit">Save</button>
                     </div>
                 </form>

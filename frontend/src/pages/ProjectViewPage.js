@@ -71,7 +71,7 @@ const ProjectViewPage = () => {
             </div>
 
             {activeView === "Proj" && <ViewProject project={project} userEmail={user?.email} />}
-            {activeView === "Actv" && <ViewActivity project={project} activities={activities} />}
+            {activeView === "Actv" && <ViewActivity project={project} activities={activities} id={project._id} />}
         </div>
     );
 };

@@ -14,6 +14,7 @@ const ProjectCards = ({
     onDeleteProject,
     members
 }) => {
+
     const isOwner = owner?.email === userEmail;
 
     return (
