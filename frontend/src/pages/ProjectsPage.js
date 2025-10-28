@@ -23,8 +23,20 @@ const ProjectsPage = () => {
     fetchProjects();
   }, [scope, sort, user]);
 
-  const handleDeleteProject = (projectId) => {
-    setProjects(prev => prev.filter(p => p.id !== projectId));
+  const handleDeleteProject = async (projectId) => {
+    try {
+      const response = await fetch(`/api/projects/${projectId}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) {
+        const data = await response.json();
+        console.error('Delete failed:', data.error);
+        return;
+      }
+      setProjects(prev => prev.filter(p => p._id !== projectId));
+    } catch (err) {
+      console.error('Delete request failed:', err);
+    }
   };
 
   if (!user) return <div>Please log in to view projects.</div>;
@@ -51,7 +63,7 @@ const ProjectsPage = () => {
                 All Projects
               </button>
             </div>
-            <Sort onChange={(e) => setSort(e.target.value)} />
+            <Sort value={sort} onChange={(e) => setSort(e.target.value)} />
           </div>
           <CardGrid
             projects={projects}

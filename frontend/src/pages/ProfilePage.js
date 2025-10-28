@@ -15,39 +15,18 @@ const ProfilePage = () => {
     const { user, loading, logout } = useContext(UserContext);
     const { id } = useParams();
     const [activeSection, setActiveSection] = useState('Prof');
-    const [activeSectionSide, setActiveSectionSide] = useState('Frie');
+    const [activeSectionSide, setActiveSectionSide] = useState('Proj');
     const [profileLoading, setProfileLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    const [visibleFields, setVisibleFields] = useState({
-        name: true,
-        surname: true,
-        email: false,
-        phone: false,
-        dob: true,
-        country: false,
-        organization: true,
-        about: true,
-    });
-
-    const [profileData, setProfileData] = useState({
-        name: '',
-        surname: '',
-        email: '',
-        phone: '',
-        dob: '',
-        country: '',
-        organization: '',
-        about: '',
-    });
-
+    const [userInfo, setUserInfo] = useState([]);
     const [activities, setActivities] = useState([]);
     const [projects, setProjects] = useState([]);
     const [friends, setFriends] = useState([]);
 
-    const isOwner = user?.id === parseInt(id);
+    const isOwner = user?.id === id;
 
-    // fetch profile by id
+    // Fetch user profile
     useEffect(() => {
         const fetchProfile = async () => {
             if (!id) return;
@@ -56,16 +35,8 @@ const ProfilePage = () => {
                 if (!response.ok) throw new Error('Failed to fetch user');
                 const data = await response.json();
 
-                setProfileData({
-                    name: data.name || data.firstName || '',
-                    surname: data.surname || data.lastName || '',
-                    email: data.email || '',
-                    phone: data.phone || '',
-                    dob: data.dob || '',
-                    country: data.country || '',
-                    organization: data.organization || '',
-                    about: data.about || '',
-                });
+                // Use userInfo array from backend
+                setUserInfo(data.userInfo || []);
             } catch (err) {
                 console.error(err);
                 setError(err.message);
@@ -76,13 +47,14 @@ const ProfilePage = () => {
         fetchProfile();
     }, [id]);
 
-    // fetch activities, projects, friends after email is loaded
+    // Fetch activities, projects, friends once email is available
     useEffect(() => {
-        if (!profileData.email) return;
+        const emailField = userInfo.find(f => f.field === 'email');
+        if (!emailField?.value) return;
 
         const fetchActivities = async () => {
             try {
-                const res = await fetch(`/api/activities?scope=local&email=${profileData.email}`);
+                const res = await fetch(`/api/activities?scope=local&email=${emailField.value}`);
                 if (!res.ok) throw new Error("Failed to fetch activities");
                 const data = await res.json();
                 setActivities(data || []);
@@ -94,7 +66,7 @@ const ProfilePage = () => {
 
         const fetchProjects = async () => {
             try {
-                const res = await fetch(`/api/projects?email=${profileData.email}&scope=my`);
+                const res = await fetch(`/api/projects?email=${emailField.value}&scope=my`);
                 if (!res.ok) throw new Error("Failed to fetch projects");
                 const data = await res.json();
                 setProjects(data || []);
@@ -110,12 +82,12 @@ const ProfilePage = () => {
                 if (!res.ok) throw new Error("Failed to fetch friends");
                 const data = await res.json();
                 const normalized = data.map(f => ({
-                    id: f.id,
+                    id: f.id || f._id?.toString(),
                     firstName: f.firstName,
                     lastName: f.lastName,
                     email: f.email,
                     avatar: f.avatar || "/assets/img/placeholder.png",
-                    online: f.online ?? false
+                    online: f.status ?? false 
                 }));
                 setFriends(normalized);
             } catch (err) {
@@ -127,7 +99,7 @@ const ProfilePage = () => {
         fetchActivities();
         fetchProjects();
         fetchFriends();
-    }, [profileData.email, id]);
+    }, [userInfo, id]);
 
     const handleButtonClick = (section) => setActiveSection(section);
     const handleButtonClickSide = (section) => setActiveSectionSide(section);
@@ -138,34 +110,28 @@ const ProfilePage = () => {
         if (activeSection === 'Edit') {
             try {
                 const res = await fetch(`/api/users/${user.id}`, {
-                    method: 'PUT',
+                    method: 'PATCH',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        id: user.id,
-                        name: profileData.name,
-                        surname: profileData.surname,
-                        email: profileData.email,
-                        phone: profileData.phone,
-                        dob: profileData.dob,
-                        country: profileData.country,
-                        organization: profileData.organization,
-                        about: profileData.about,
-                    }),
+                    body: JSON.stringify({ userInfo }),
                 });
 
-                if (!res.ok) throw new Error('Failed to update profile');
-                const data = await res.json();
-                console.log('Profile updated', data);
+                if (!res.ok) {
+                    const errData = await res.json();
+                    throw new Error(errData.error || 'Failed to save profile');
+                }
+
+                const updated = await res.json();
+                setUserInfo(updated.user.userInfo || userInfo);
+                alert("Profile saved successfully!");
+                setActiveSection('Prof');
             } catch (err) {
                 console.error(err);
-                alert('Failed to save profile changes');
+                alert(err.message);
             }
-            setActiveSection('Prof');
         } else {
             setActiveSection('Edit');
         }
     };
-
 
     const handleDeleteProfile = async () => {
         if (!isOwner) return;
@@ -183,15 +149,12 @@ const ProfilePage = () => {
         }
     };
 
-    const updateVisibility = (field) =>
-        setVisibleFields((prev) => ({ ...prev, [field]: !prev[field] }));
-
-    const updateFieldValue = (field, value) =>
-        setProfileData((prev) => ({ ...prev, [field]: value }));
-
     if (loading || profileLoading) return <div>Loading...</div>;
     if (!user) return <Navigate to="/login" />;
     if (error) return <div>Error: {error}</div>;
+
+    const firstName = userInfo.find(f => f.field === 'name')?.value || '';
+    const lastName = userInfo.find(f => f.field === 'surname')?.value || '';
 
     return (
         <div className="profile-container">
@@ -206,20 +169,16 @@ const ProfilePage = () => {
                 )}
 
                 <img src="/assets/img/placeholder.png" alt="pfp" className="pfp" />
-                <h2>{profileData.name} {profileData.surname}</h2>
+                <h2>{firstName} {lastName}</h2>
                 <div className="hLine"></div>
 
-                {activeSection === 'Prof' && (
-                    <ProfileSection visibleFields={visibleFields} profileData={profileData} />
-                )}
+                {activeSection === 'Prof' && <ProfileSection userInfo={userInfo} />}
                 {activeSection === 'Actv' && <ActivitySection activities={activities} />}
                 {activeSection === 'Clou' && <WordCloud />}
                 {activeSection === 'Edit' && isOwner && (
                     <EditProfile
-                        visibleFields={visibleFields}
-                        updateVisibility={updateVisibility}
-                        profileData={profileData}
-                        updateFieldValue={updateFieldValue}
+                        userInfo={userInfo}
+                        setUserInfo={setUserInfo}
                         onDelete={handleDeleteProfile}
                     />
                 )}
@@ -229,33 +188,23 @@ const ProfilePage = () => {
                 <button
                     className={activeSection === 'Prof' ? 'active' : ''}
                     onClick={() => handleButtonClick('Prof')}
-                >
-                    Prof
-                </button>
+                >Prof</button>
                 <button
                     className={activeSection === 'Actv' ? 'active' : ''}
                     onClick={() => handleButtonClick('Actv')}
-                >
-                    Actv
-                </button>
+                >Actv</button>
                 <button
                     className={activeSection === 'Clou' ? 'active' : ''}
                     onClick={() => handleButtonClick('Clou')}
-                >
-                    Clou
-                </button>
+                >Clou</button>
                 <button
                     className={activeSectionSide === 'Frie' ? 'active' : ''}
                     onClick={() => handleButtonClickSide('Frie')}
-                >
-                    Frie
-                </button>
+                >Frie</button>
                 <button
                     className={activeSectionSide === 'Proj' ? 'active' : ''}
                     onClick={() => handleButtonClickSide('Proj')}
-                >
-                    Proj
-                </button>
+                >Proj</button>
             </div>
 
             <div className="sideCol">
@@ -263,7 +212,7 @@ const ProfilePage = () => {
                     <FriendsSection
                         friends={friends}
                         setFriends={setFriends}
-                        profileId={parseInt(id)}
+                        profileId={id}
                         currentUserId={user.id}
                     />
                 )}

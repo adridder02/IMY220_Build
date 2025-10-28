@@ -31,46 +31,48 @@ const LoginPage = () => {
             if (!response.ok) {
                 throw new Error(data.error || 'Login failed');
             }
+
             console.log('Login response:', data.user); // debug
-            setUser({ id: data.user.id, email: data.user.email, name: data.user.name });
+            setUser({
+                id: data.user.id,
+                email: data.user.email,
+                name: data.user.name,
+            });
             navigate('/home');
         } catch (err) {
             setError(err.message);
         }
     };
 
-
     return (
-        <>
-            <div className="form" id="logreg-container">
-                <h1>Login</h1>
-                {error && <p style={{ color: 'red' }}>{error}</p>}
-                <form onSubmit={handleSubmit}>
-                    <div>
-                        <label htmlFor="email">Email</label>
-                        <input
-                            type="text"
-                            id="email"
-                            value={formData.email}
-                            onChange={handleInputChange}
-                        />
-                    </div>
-                    <div>
-                        <label htmlFor="password">Password</label>
-                        <input
-                            type="password"
-                            id="password"
-                            value={formData.password}
-                            onChange={handleInputChange}
-                        />
-                    </div>
-                    <Link to="/under_construction.html">Forgot password?</Link>
-                    <div className="button-container">
-                        <button type="submit">Sign In</button>
-                    </div>
-                </form>
-            </div>
-        </>
+        <div className="form" id="logreg-container">
+            <h1>Login</h1>
+            {error && <p style={{ color: 'red' }}>{error}</p>}
+            <form onSubmit={handleSubmit}>
+                <div>
+                    <label htmlFor="email">Email</label>
+                    <input
+                        type="text"
+                        id="email"
+                        value={formData.email}
+                        onChange={handleInputChange}
+                    />
+                </div>
+                <div>
+                    <label htmlFor="password">Password</label>
+                    <input
+                        type="password"
+                        id="password"
+                        value={formData.password}
+                        onChange={handleInputChange}
+                    />
+                </div>
+                <Link to="/under_construction.html">Forgot password?</Link>
+                <div className="button-container">
+                    <button type="submit">Sign In</button>
+                </div>
+            </form>
+        </div>
     );
 };
 

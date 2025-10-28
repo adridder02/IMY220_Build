@@ -262,7 +262,7 @@ div#projSectLine.hLine {
     margin-top: 2.5vw;
 }
 
-.projectSection button {
+.projectSection button.viewall {
     margin: 2.5vw auto;
     padding: 1vw 4vw;
     border-radius: 30px;
@@ -274,6 +274,11 @@ div#projSectLine.hLine {
     display: flex;
     flex-direction: column;
     width: 100%;
+}
+
+.projectSection .cardMini button {
+    width: 5vw;
+    margin: 0 auto;
 }
 
 /* Friends Section */

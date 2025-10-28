@@ -146,7 +146,7 @@ export const CreateProject = ({ onClose, onProjectCreated }) => {
     );
 };
 
-export const CheckInProject = ({ projectId, onClose }) => {
+export const CheckInProject = ({ projectId, userEmail, onCheckIn, onClose }) => {
     const { user } = useContext(UserContext);
     const [formData, setFormData] = useState({
         description: '',
@@ -154,13 +154,35 @@ export const CheckInProject = ({ projectId, onClose }) => {
         files: [],
     });
     const [error, setError] = useState('');
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchProject = async () => {
+            try {
+                const response = await fetch(`/api/projects/${projectId}`);
+                if (!response.ok) throw new Error('Failed to fetch project');
+                const data = await response.json();
+                setFormData({
+                    description: '',
+                    version: data.version,
+                    files: data.files || [],
+                });
+            } catch (err) {
+                setError(err.message);
+            } finally {
+                setLoading(false);
+            }
+        };
+        if (projectId) fetchProject();
+    }, [projectId]);
 
     const handleInputChange = (field, value) => {
         setFormData((prev) => ({ ...prev, [field]: value }));
     };
 
     const handleAddFile = (file) => {
-        setFormData((prev) => ({ ...prev, files: [...prev.files, file] }));
+        if (!file) return;
+        setFormData((prev) => ({ ...prev, files: [...prev.files, file.name || file] }));
     };
 
     const handleSubmit = async (e) => {
@@ -170,17 +192,19 @@ export const CheckInProject = ({ projectId, onClose }) => {
             const response = await fetch(`/api/projects/${projectId}/checkin`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ ...formData, userEmail: user.email }),
+                body: JSON.stringify({ ...formData, userEmail }),
             });
             const data = await response.json();
-            if (!response.ok) {
-                throw new Error(data.error || 'Failed to check in project');
-            }
+            if (!response.ok) throw new Error(data.error || 'Failed to check in project');
+            onCheckIn(data.project);
             onClose();
         } catch (err) {
             setError(err.message);
         }
     };
+
+    if (loading) return <div>Loading...</div>;
+    if (error) return <div>Error: {error}</div>;
 
     return (
         <div className="popup checkInForm">
@@ -201,8 +225,14 @@ export const CheckInProject = ({ projectId, onClose }) => {
                 <form onSubmit={handleSubmit}>
                     <div className="formContent">
                         <div className="leftCol">
-                            <Description value={formData.description} onChange={(e) => handleInputChange('description', e.target.value)} />
-                            <Version value={formData.version} onChange={(e) => handleInputChange('version', e.target.value)} />
+                            <Description
+                                value={formData.description}
+                                onChange={(e) => handleInputChange('description', e.target.value)}
+                            />
+                            <Version
+                                value={formData.version}
+                                onChange={(e) => handleInputChange('version', e.target.value)}
+                            />
                         </div>
                         <div className="rightCol">
                             <AddFiles files={formData.files} onAddFile={handleAddFile} />

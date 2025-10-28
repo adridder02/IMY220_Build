@@ -8,7 +8,7 @@ export default function activityRoutes(db) {
   router.get("/", async (req, res) => {
     try {
       const { scope, email, project, search, sort } = req.query;
-      let query = {};
+      const query = {};
 
       if (scope === "local" && email) query.email = email;
       if (project) query.projectName = { $regex: project, $options: "i" };
@@ -18,11 +18,30 @@ export default function activityRoutes(db) {
           { projectName: regex },
           { user: regex },
           { action: regex },
-          { description: regex }
+          { description: regex },
         ];
       }
 
+      // Fetch activities
       let activities = await activitiesCollection.find(query).toArray();
+
+      // Fetch corresponding projects
+      const projectNames = [...new Set(activities.map(a => a.projectName).filter(Boolean))];
+      const projects = await db.collection("projects")
+        .find({ name: { $in: projectNames } })
+        .toArray();
+
+      const projectMap = {};
+      projects.forEach(p => {
+        projectMap[p.name] = p;
+      });
+
+      // Add project description to activities
+      activities = activities.map(a => ({
+        ...a,
+        id: a._id.toString(),
+        projectDescription: projectMap[a.projectName]?.description || a.description
+      }));
 
       // Sorting
       if (sort) {

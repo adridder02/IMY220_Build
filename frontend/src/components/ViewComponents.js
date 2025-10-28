@@ -105,7 +105,7 @@ export const ViewMembers = ({ members = [], setMembers, profileId, currentUserId
 
             const data = await res.json();
             setMembers(data.project.members);
-            setMemberInput("");  
+            setMemberInput("");
             setSuggestions([]);
         } catch (err) {
             console.error(err);
@@ -171,7 +171,12 @@ export const ViewMembers = ({ members = [], setMembers, profileId, currentUserId
 
 export const ViewProject = ({ project, userEmail }) => {
     const [activeView, setActiveView] = useState("file");
-    const [currentProject, setCurrentProject] = useState(project);
+    const [currentProject, setCurrentProject] = useState({
+        ...project,
+        _id: project._id?.toString(),
+    });
+    const [commentInput, setCommentInput] = useState("");
+    const [commentError, setCommentError] = useState("");
     const isOwnerOrMember =
         project.owner?.email === userEmail || project.members?.some(m => m.email === userEmail);
 
@@ -193,10 +198,9 @@ export const ViewProject = ({ project, userEmail }) => {
 
     const handleCheckClick = async () => {
         if (!isOwnerOrMember) return;
-
         if (!currentProject.checkedOutBy) {
             try {
-                const res = await fetch(`/api/projects/${currentProject.id}/checkout`, {
+                const res = await fetch(`/api/projects/${currentProject._id}/checkout`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ email: userEmail }),
@@ -214,13 +218,30 @@ export const ViewProject = ({ project, userEmail }) => {
     };
 
     const handleDownload = () => {
-        window.open(`/api/projects/download-multiple/${currentProject.id}`, "_blank");
+        window.open(`/api/projects/download-multiple/${currentProject._id}`, "_blank");
     };
 
-    const handleChat = () => {
-        toggleRight("chat");
+    const handleCommentSubmit = async (e) => {
+        e.preventDefault();
+        if (!commentInput.trim()) {
+            setCommentError("Comment cannot be empty");
+            return;
+        }
+        try {
+            const res = await fetch(`/api/projects/${currentProject._id}/comments`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email: userEmail, comment: commentInput }),
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || "Failed to add comment");
+            setCommentInput("");
+            setCommentError("");
+        } catch (err) {
+            console.error(err);
+            setCommentError(err.message);
+        }
     };
-
 
     return (
         <>
@@ -239,7 +260,7 @@ export const ViewProject = ({ project, userEmail }) => {
                         {checkButtonLabel}
                     </button>
                     <button onClick={handleDownload}>Dow</button>
-                    <button onClick={handleChat}>Chat</button>
+                    <button onClick={() => toggleRight("chat")}>Chat</button>
                     {isOwnerOrMember && (
                         <button className="editButton" onClick={() => toggleRight("edit")}>
                             Edit
@@ -260,7 +281,7 @@ export const ViewProject = ({ project, userEmail }) => {
             <div className="rightSect">
                 {activeView === "checkin" && (
                     <CheckInProject
-                        projectId={currentProject.id}
+                        projectId={currentProject._id}
                         userEmail={userEmail}
                         onCheckIn={(updatedProject) => {
                             setCurrentProject(updatedProject);
@@ -271,13 +292,38 @@ export const ViewProject = ({ project, userEmail }) => {
                 )}
                 {activeView === "edit" && (
                     <EditProject
-                        projectId={currentProject.id}
+                        projectId={currentProject._id}
                         onClose={() => setActiveView("file")}
                     />
                 )}
                 {activeView === "chat" && (
-                    <div>
-                        Chat Panel
+                    <div className="chatPanel">
+                        <h3 className="heading3">Project Chat</h3>
+                        <form onSubmit={handleCommentSubmit}>
+                            <div className="commentInput">
+                                <textarea
+                                    placeholder="Add a comment..."
+                                    value={commentInput}
+                                    onChange={(e) => setCommentInput(e.target.value)}
+                                />
+                                <button type="submit" disabled={!isOwnerOrMember}>
+                                    Send
+                                </button>
+                            </div>
+                            {commentError && <p style={{ color: "red" }}>{commentError}</p>}
+                        </form>
+                        <div className="commentList">
+                            {project.activities
+                                ?.filter((a) => a.actionType === "comment")
+                                .map((activity) => (
+                                    <div key={activity.id} className="comment">
+                                        <p>
+                                            <strong>{activity.user}</strong> ({activity.email}) at {new Date(activity.timestamp).toLocaleString()}
+                                        </p>
+                                        <p>{activity.description.split(": ")[1] || activity.description}</p>
+                                    </div>
+                                ))}
+                        </div>
                         <button onClick={() => setActiveView("file")}>Close</button>
                     </div>
                 )}

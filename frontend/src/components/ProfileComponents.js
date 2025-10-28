@@ -1,251 +1,116 @@
 import React from 'react';
 import Activities from '../components/Activities';
 import { useParams, Link } from "react-router-dom";
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
+import { UserContext } from '../Session';
 
-export const ProfileSection = ({ visibleFields, profileData }) => {
+export const ProfileSection = ({ userInfo }) => {
+    const leftFields = ["name", "surname", "email", "phone", "dob"];
+    const rightFields = ["country", "organization", "about"];
+
     return (
         <div className='profileInfo'>
             <div className='leftCol'>
-                {visibleFields.name && (
-                    <div>
-                        <label>Name</label>
-                        <p>{profileData.name || '-'}</p>
-                    </div>
-                )}
-
-                {visibleFields.surname && (
-                    <div>
-                        <label>Surname</label>
-                        <p>{profileData.surname || '-'}</p>
-                    </div>
-                )}
-
-                {visibleFields.email && (
-                    <div>
-                        <label>Email</label>
-                        <p>{profileData.email || '-'}</p>
-                    </div>
-                )}
-
-                {visibleFields.phone && (
-                    <div>
-                        <label>Phone Number</label>
-                        <p>{profileData.phone || '-'}</p>
-                    </div>
-                )}
-
-                {visibleFields.dob && (
-                    <div>
-                        <label>Date of Birth</label>
-                        <p>{profileData.dob || '-'}</p>
-                    </div>
-                )}
+                {userInfo.filter(f => ["name", "surname", "email", "phone", "dob"].includes(f.field) && f.visible)
+                    .map(f => (
+                        <div key={f.field}>
+                            <label>{f.field.charAt(0).toUpperCase() + f.field.slice(1)}</label>
+                            <p>{f.value || '-'}</p>
+                        </div>
+                    ))}
             </div>
 
             <div className='rightCol'>
-                {visibleFields.country && (
-                    <div>
-                        <label>Country</label>
-                        <p>{profileData.country || '-'}</p>
-                    </div>
-                )}
-
-                {visibleFields.organization && (
-                    <div>
-                        <label>Organization</label>
-                        <p>{profileData.organization || '-'}</p>
-                    </div>
-                )}
-
-                {visibleFields.about && (
-                    <div>
-                        <label>About</label>
-                        <p>{profileData.about || '-'}</p>
-                    </div>
-                )}
+                {userInfo.filter(f => ["country", "organization", "about"].includes(f.field) && f.visible)
+                    .map(f => (
+                        <div key={f.field}>
+                            <label>{f.field.charAt(0).toUpperCase() + f.field.slice(1)}</label>
+                            <p>{f.value || '-'}</p>
+                        </div>
+                    ))}
             </div>
         </div>
     );
 };
 
-export const EditProfile = ({ visibleFields, updateVisibility, profileData, updateFieldValue, onDelete }) => {
+export const EditProfile = ({ userInfo, setUserInfo, onDelete }) => {
+
+    const handleValueChange = (field, value) => {
+        setUserInfo(prev => prev.map(f => f.field === field ? { ...f, value } : f));
+    };
+
+    const handleVisibilityToggle = (field) => {
+        setUserInfo(prev => prev.map(f => f.field === field ? { ...f, visible: !f.visible } : f));
+    };
+
     return (
         <>
             <div className='profileInfo'>
                 <div className='leftCol'>
-                    <div>
-                        <div className='editGroup'>
-                            <label>Name</label>
-                            <label className="switch">
+                    {["name", "surname", "email", "phone", "dob"].map(f => {
+                        const fieldObj = userInfo.find(u => u.field === f);
+                        return (
+                            <div key={f}>
+                                <div className='editGroup'>
+                                    <label>{f.charAt(0).toUpperCase() + f.slice(1)}</label>
+                                    <label className="switch">
+                                        <input
+                                            type="checkbox"
+                                            checked={fieldObj.visible}
+                                            onChange={() => handleVisibilityToggle(f)}
+                                        />
+                                        <span className="slider"></span>
+                                    </label>
+                                </div>
                                 <input
-                                    type="checkbox"
-                                    checked={visibleFields.name}
-                                    onChange={() => updateVisibility('name')}
+                                    type="text"
+                                    value={fieldObj.value}
+                                    placeholder={f}
+                                    onChange={(e) => handleValueChange(f, e.target.value)}
                                 />
-                                <span className="slider"></span>
-                            </label>
-                        </div>
-                        <input
-                            type="text"
-                            value={profileData.name}
-                            placeholder="Name"
-                            onChange={(e) => updateFieldValue('name', e.target.value)}
-                        />
-                    </div>
-
-                    <div>
-                        <div className='editGroup'>
-                            <label>Surname</label>
-                            <label className="switch">
-                                <input
-                                    type="checkbox"
-                                    checked={visibleFields.surname}
-                                    onChange={() => updateVisibility('surname')}
-                                />
-                                <span className="slider"></span>
-                            </label>
-                        </div>
-                        <input
-                            type="text"
-                            value={profileData.surname}
-                            placeholder="Surname"
-                            onChange={(e) => updateFieldValue('surname', e.target.value)}
-                        />
-                    </div>
-
-                    <div>
-                        <div className='editGroup'>
-                            <label>Email</label>
-                            <label className="switch">
-                                <input
-                                    type="checkbox"
-                                    checked={visibleFields.email}
-                                    onChange={() => updateVisibility('email')}
-                                />
-                                <span className="slider"></span>
-                            </label>
-                        </div>
-                        <input
-                            type="text"
-                            value={profileData.email}
-                            placeholder="example@gmail.com"
-                            onChange={(e) => updateFieldValue('email', e.target.value)}
-                        />
-                    </div>
-
-                    <div>
-                        <div className='editGroup'>
-                            <label>Phone Number</label>
-                            <label className="switch">
-                                <input
-                                    type="checkbox"
-                                    checked={visibleFields.phone}
-                                    onChange={() => updateVisibility('phone')}
-                                />
-                                <span className="slider"></span>
-                            </label>
-                        </div>
-                        <input
-                            type="text"
-                            value={profileData.phone}
-                            placeholder="081 123 1234"
-                            onChange={(e) => updateFieldValue('phone', e.target.value)}
-                        />
-                    </div>
-
-                    <div>
-                        <div className='editGroup'>
-                            <label>Date of Birth</label>
-                            <label className="switch">
-                                <input
-                                    type="checkbox"
-                                    checked={visibleFields.dob}
-                                    onChange={() => updateVisibility('dob')}
-                                />
-                                <span className="slider"></span>
-                            </label>
-                        </div>
-                        <input
-                            type="text"
-                            value={profileData.dob}
-                            placeholder="18/12/2001"
-                            onChange={(e) => updateFieldValue('dob', e.target.value)}
-                        />
-                    </div>
+                            </div>
+                        );
+                    })}
                 </div>
 
                 <div className='rightCol'>
-                    <div>
-                        <div className='editGroup'>
-                            <label>Country</label>
-                            <label className="switch">
-                                <input
-                                    type="checkbox"
-                                    checked={visibleFields.country}
-                                    onChange={() => updateVisibility('country')}
-                                />
-                                <span className="slider"></span>
-                            </label>
-                        </div>
-                        <input
-                            type="text"
-                            value={profileData.country}
-                            placeholder="America"
-                            onChange={(e) => updateFieldValue('country', e.target.value)}
-                        />
-                    </div>
-
-                    <div>
-                        <div className='editGroup'>
-                            <label>Organization</label>
-                            <label className="switch">
-                                <input
-                                    type="checkbox"
-                                    checked={visibleFields.organization}
-                                    onChange={() => updateVisibility('organization')}
-                                />
-                                <span className="slider"></span>
-                            </label>
-                        </div>
-                        <input
-                            type="text"
-                            value={profileData.organization}
-                            placeholder="Company Name"
-                            onChange={(e) => updateFieldValue('organization', e.target.value)}
-                        />
-                    </div>
-
-                    <div>
-                        <div className='editGroup'>
-                            <label>About</label>
-                            <label className="switch">
-                                <input
-                                    type="checkbox"
-                                    checked={visibleFields.about}
-                                    onChange={() => updateVisibility('about')}
-                                />
-                                <span className="slider"></span>
-                            </label>
-                        </div>
-                        <textarea
-                            value={profileData.about}
-                            placeholder="About you"
-                            onChange={(e) => updateFieldValue('about', e.target.value)}
-                        />
-                    </div>
-
+                    {["country", "organization", "about"].map(f => {
+                        const fieldObj = userInfo.find(u => u.field === f);
+                        return (
+                            <div key={f}>
+                                <div className='editGroup'>
+                                    <label>{f.charAt(0).toUpperCase() + f.slice(1)}</label>
+                                    <label className="switch">
+                                        <input
+                                            type="checkbox"
+                                            checked={fieldObj.visible}
+                                            onChange={() => handleVisibilityToggle(f)}
+                                        />
+                                        <span className="slider"></span>
+                                    </label>
+                                </div>
+                                {f === "about" ? (
+                                    <textarea
+                                        value={fieldObj.value}
+                                        placeholder={f}
+                                        onChange={(e) => handleValueChange(f, e.target.value)}
+                                    />
+                                ) : (
+                                    <input
+                                        type="text"
+                                        value={fieldObj.value}
+                                        placeholder={f}
+                                        onChange={(e) => handleValueChange(f, e.target.value)}
+                                    />
+                                )}
+                            </div>
+                        );
+                    })}
                 </div>
             </div>
+
             <div className="deleteProfile">
-                <button
-                    className="deleteButton"
-                    onClick={() => {
-                        if (window.confirm("Are you sure you want to delete your profile? This cannot be undone.")) {
-                            onDelete();
-                        }
-                    }}
-                >
+                <button className="deleteButton" onClick={() => { if (window.confirm("Are you sure?")) onDelete(); }}>
                     Delete Profile
                 </button>
             </div>
@@ -270,48 +135,77 @@ export const WordCloud = () => {
     );
 };
 
-export const FriendsSection = ({ friends, setFriends, profileId, currentUserId }) => {
-    const [friendInput, setFriendInput] = React.useState("");
-    const [suggestions, setSuggestions] = React.useState([]);
-    const [loading, setLoading] = React.useState(false);
+export const FriendsSection = ({ profileId, currentUserId }) => {
+    const { user } = useContext(UserContext);
+    const isOwner = profileId === currentUserId;
 
-    const isOwner = profileId === currentUserId; // only the owner can edit
+    const [friends, setFriends] = useState([]);
+    const [friendInput, setFriendInput] = useState("");
+    const [suggestions, setSuggestions] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [friendRequests, setFriendRequests] = useState([]);
+
+    // Fetch friend requests (if owner)
+    useEffect(() => {
+        if (!isOwner) return;
+
+        const fetchRequests = async () => {
+            try {
+                const res = await fetch(`/api/users/${profileId}`);
+                const data = await res.json();
+                setFriendRequests(data.friendRequests?.map(r => ({ ...r, _id: r._id.toString() })) || []);
+            } catch (err) {
+                console.error(err);
+            }
+        };
+        fetchRequests();
+    }, [profileId, isOwner]);
+
+    // Fetch friends dynamically
+    useEffect(() => {
+        const fetchFriends = async () => {
+            try {
+                const res = await fetch(`/api/users/${profileId}/friends`);
+                if (!res.ok) throw new Error("Failed to fetch friends");
+                const data = await res.json();
+                setFriends(data);
+            } catch (err) {
+                console.error(err);
+                setFriends([]);
+            }
+        };
+
+        fetchFriends();
+    }, [profileId]);
 
     const handleInputChange = (e) => {
         if (!isOwner) return;
-
         const value = e.target.value;
         setFriendInput(value);
-
-        if (!value) {
-            setSuggestions([]);
-            return;
-        }
+        if (!value) return setSuggestions([]);
 
         setLoading(true);
         fetch(`/api/users?search=${encodeURIComponent(value)}`)
             .then(res => res.json())
             .then(data => {
                 const filtered = data.filter(
-                    u => u.id !== profileId && !friends.some(f => f.id === u.id)
+                    u => u._id !== profileId && !friends.some(f => f.id === u._id)
                 );
-                setSuggestions(filtered);
+                setSuggestions(filtered.map(u => ({ ...u, id: u._id })));
             })
             .catch(console.error)
             .finally(() => setLoading(false));
     };
 
-    const handleAddFriend = async (friend) => {
-        if (!isOwner) return;
+    const handleSendRequest = async (friend) => {
         try {
-            const res = await fetch(`/api/users/${profileId}/friends`, {
+            const res = await fetch(`/api/users/${friend.id}/friend-request`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email: friend.email }),
+                body: JSON.stringify({ senderEmail: user.email }),
             });
-            if (!res.ok) throw new Error("Failed to add friend");
-            const data = await res.json();
-            setFriends([...data.friends]);
+            if (!res.ok) throw new Error("Failed to send friend request");
+            alert("Friend request sent!");
             setFriendInput("");
             setSuggestions([]);
         } catch (err) {
@@ -320,19 +214,38 @@ export const FriendsSection = ({ friends, setFriends, profileId, currentUserId }
         }
     };
 
-    const handleRemoveFriend = async (friendId) => {
-        if (!isOwner) return;
-        if (!window.confirm("Are you sure you want to remove this friend?")) return;
-
-        setFriends(prev => prev.filter(f => f.id !== friendId)); 
-
+    const handleAcceptRequest = async (senderId) => {
         try {
-            const res = await fetch(`/api/users/${profileId}/friends/${friendId}`, {
-                method: "DELETE",
-            });
+            const res = await fetch(`/api/users/${profileId}/friend-request/${senderId}/accept`, { method: "POST" });
+            if (!res.ok) throw new Error("Failed to accept request");
+            const data = await res.json();
+            setFriends(data.friends || []);
+            setFriendRequests(prev => prev.filter(r => r._id !== senderId));
+        } catch (err) {
+            console.error(err);
+            alert(err.message);
+        }
+    };
+
+    const handleRejectRequest = async (senderId) => {
+        if (!window.confirm("Are you sure you want to reject this friend request?")) return;
+        try {
+            const res = await fetch(`/api/users/${profileId}/friend-request/${senderId}/reject`, { method: "POST" });
+            if (!res.ok) throw new Error("Failed to reject request");
+            setFriendRequests(prev => prev.filter(r => r._id !== senderId));
+        } catch (err) {
+            console.error(err);
+            alert(err.message);
+        }
+    };
+
+    const handleRemoveFriend = async (friendId) => {
+        if (!window.confirm("Are you sure you want to remove this friend?")) return;
+        try {
+            const res = await fetch(`/api/users/${profileId}/friends/${friendId}`, { method: "DELETE" });
             if (!res.ok) throw new Error("Failed to remove friend");
             const data = await res.json();
-            setFriends([...data.friends]);
+            setFriends(data.friends || []);
         } catch (err) {
             console.error(err);
             alert(err.message);
@@ -353,18 +266,30 @@ export const FriendsSection = ({ friends, setFriends, profileId, currentUserId }
                     />
                 </div>
             )}
+
             {loading && <p>Loading suggestions...</p>}
             {!loading && suggestions.length > 0 && isOwner && (
                 <ul className="suggestionsList">
                     {suggestions.map(s => (
                         <li key={s.id} className="suggestionItem">
-                            <span className="suggestionText">
-                                {s.firstName} {s.lastName} ({s.email})
-                            </span>
-                            <button onClick={() => handleAddFriend(s)}>Add</button>
+                            <span className="suggestionText">{s.firstName} {s.lastName} ({s.email})</span>
+                            <button onClick={() => handleSendRequest(s)}>Add</button>
                         </li>
                     ))}
                 </ul>
+            )}
+
+            {isOwner && friendRequests.length > 0 && (
+                <div className="pendingRequests">
+                    <h3>Pending Friend Requests</h3>
+                    {friendRequests.map(req => (
+                        <div key={req._id} className="requestItem">
+                            {req.firstName} {req.lastName}
+                            <button onClick={() => handleAcceptRequest(req._id)}>Accept</button>
+                            <button onClick={() => handleRejectRequest(req._id)}>Reject</button>
+                        </div>
+                    ))}
+                </div>
             )}
 
             <div className="hLine"></div>
@@ -372,16 +297,15 @@ export const FriendsSection = ({ friends, setFriends, profileId, currentUserId }
             <div className="friendsList">
                 {friends.map(friend => (
                     <Friend
-                        key={friend.id ?? friend.email ?? `${friend.firstName}-${friend.lastName}`}
+                        key={friend.id}
                         friend={friend}
-                        onRemove={isOwner ? handleRemoveFriend : undefined}
+                        onRemove={isOwner ? () => handleRemoveFriend(friend.id) : undefined}
                     />
                 ))}
             </div>
         </div>
     );
 };
-
 
 export const Friend = ({ friend, onRemove }) => {
     return (
@@ -419,7 +343,7 @@ export const ProjectSection = ({ projects = [] }) => {
                 ))}
             </div>
             <div className="hLine"></div>
-            <button><Link to="/projects">View Projects</Link></button>
+            <button className='viewall'><Link to="/projects">View Projects</Link></button>
         </div>
     );
 };
@@ -431,6 +355,10 @@ export const CardMini = ({ project }) => {
             <img src={"/assets/img/placeholder.png"} alt="projectImg" />
             <div className="hLine"></div>
             <h3>{project.name}</h3>
+            <div className="hLine"></div>
+            <button>
+                <Link to={`/projects/${project._id}`}>View</Link>
+            </button>
         </div>
     );
 };

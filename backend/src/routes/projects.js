@@ -1,4 +1,5 @@
 import express from "express";
+import { ObjectId } from "mongodb";
 
 export default function projectRoutes(db) {
   const router = express.Router();
@@ -6,11 +7,24 @@ export default function projectRoutes(db) {
   const usersCollection = db.collection("users");
   const activitiesCollection = db.collection("activities");
 
+  // Helper function to create activity
+  const createActivity = async (actionType, userName, email, projectName, description) => {
+    await activitiesCollection.insertOne({
+      actionType,
+      user: userName,
+      email,
+      action: `${actionType === "create" ? "created" : actionType === "delete" ? "deleted" : actionType === "checkin" ? "checked in" : actionType === "checkout" ? "checked out" : actionType === "join" ? "joined" : actionType === "comment" ? "commented on" : "updated"} a project`,
+      projectName,
+      timestamp: new Date().toISOString(),
+      description,
+    });
+  };
+
   // GET all projects
   router.get("/", async (req, res) => {
     try {
       const { email, scope = "all", search } = req.query;
-      let query = {};
+      const query = {};
 
       if (scope === "my" && email) query["members.email"] = email;
       if (search) query["name"] = { $regex: search, $options: "i" };
@@ -23,11 +37,20 @@ export default function projectRoutes(db) {
     }
   });
 
-  // GET single project by numeric ID
+  // GET single project by MongoDB ObjectId
   router.get("/:id", async (req, res) => {
-    const project = await projectsCollection.findOne({ id: parseInt(req.params.id) });
-    if (!project) return res.status(404).json({ error: "Project not found" });
-    res.json(project);
+    try {
+      const id = req.params.id;
+      if (!ObjectId.isValid(id)) {
+        return res.status(400).json({ error: "Invalid project ID" });
+      }
+      const project = await projectsCollection.findOne({ _id: new ObjectId(id) });
+      if (!project) return res.status(404).json({ error: "Project not found" });
+      res.json(project);
+    } catch (err) {
+      console.error("GET /projects/:id failed:", err);
+      res.status(500).json({ error: "Failed to fetch project" });
+    }
   });
 
   // POST create project
@@ -37,11 +60,13 @@ export default function projectRoutes(db) {
       if (!name || !type || !description || !version || !members?.length)
         return res.status(400).json({ error: "Missing required fields" });
 
-      const membersDetails = await usersCollection.find({ id: { $in: members.map(Number) } }).toArray();
+      const membersDetails = await usersCollection.find({ email: { $in: members } }).toArray();
+      if (!membersDetails.length) return res.status(400).json({ error: "Members not found" });
+
       const ownerUser = membersDetails[0];
+      const userName = `${ownerUser.firstName} ${ownerUser.lastName}`;
 
       const newProject = {
-        id: Date.now(), // numeric ID
         name,
         type,
         description,
@@ -49,24 +74,27 @@ export default function projectRoutes(db) {
         image: image || "/assets/img/placeholder.png",
         files: files || [],
         version,
-        owner: { id: ownerUser.id, name: `${ownerUser.firstName} ${ownerUser.lastName}` },
-        members: membersDetails.map(u => ({ id: u.id, name: `${u.firstName} ${u.lastName}`, email: u.email })),
+        owner: { _id: ownerUser._id, name: userName },
+        members: membersDetails.map(u => ({
+          _id: u._id,
+          name: `${u.firstName} ${u.lastName}`,
+          email: u.email,
+        })),
         checkedOutBy: null,
-        versionHistory: [{ version, description, date: new Date().toISOString() }]
+        versionHistory: [{ version, description, date: new Date().toISOString() }],
       };
 
-      await projectsCollection.insertOne(newProject);
-      await activitiesCollection.insertOne({
-        actionType: "create",
-        user: newProject.owner.name,
-        email: ownerUser.email,
-        action: "created a project",
-        projectName: newProject.name,
-        timestamp: new Date().toISOString(),
-        description
-      });
+      const result = await projectsCollection.insertOne(newProject);
 
-      res.status(201).json({ message: "Project created", project: newProject });
+      await createActivity(
+        "create",
+        userName,
+        ownerUser.email,
+        newProject.name,
+        `${userName} created ${newProject.name}`
+      );
+
+      res.status(201).json({ message: "Project created", project: { ...newProject, _id: result.insertedId } });
     } catch (err) {
       console.error("POST /projects failed:", err);
       res.status(500).json({ error: "Failed to create project" });
@@ -76,25 +104,29 @@ export default function projectRoutes(db) {
   // POST checkout project
   router.post("/:id/checkout", async (req, res) => {
     try {
+      const id = req.params.id;
+      if (!ObjectId.isValid(id)) return res.status(400).json({ error: "Invalid project ID" });
       const { email } = req.body;
-      const project = await projectsCollection.findOne({ id: parseInt(req.params.id) });
+      const project = await projectsCollection.findOne({ _id: new ObjectId(id) });
       if (!project) return res.status(404).json({ error: "Project not found" });
       if (project.checkedOutBy) return res.status(400).json({ error: "Project already checked out" });
 
       const user = await usersCollection.findOne({ email });
-      const checkoutUser = { id: user?.id || null, email, name: user ? `${user.firstName} ${user.lastName}` : email };
+      const userName = user ? `${user.firstName} ${user.lastName}` : email;
+      const checkoutUser = { _id: user?._id || null, email, name: userName };
 
-      await projectsCollection.updateOne({ id: project.id }, { $set: { checkedOutBy: checkoutUser } });
+      await projectsCollection.updateOne(
+        { _id: project._id },
+        { $set: { checkedOutBy: checkoutUser } }
+      );
 
-      await activitiesCollection.insertOne({
-        actionType: "checkout",
-        user: checkoutUser.name,
+      await createActivity(
+        "checkout",
+        userName,
         email,
-        action: "checked out a project",
-        projectName: project.name,
-        timestamp: new Date().toISOString(),
-        description: `${checkoutUser.name} checked out ${project.name}`
-      });
+        project.name,
+        `${userName} checked out ${project.name}`
+      );
 
       res.json({ message: "Project checked out", project: { ...project, checkedOutBy: checkoutUser } });
     } catch (err) {
@@ -103,13 +135,77 @@ export default function projectRoutes(db) {
     }
   });
 
-  // POST add member
+  // POST check-in project
+  router.post("/:id/checkin", async (req, res) => {
+    try {
+      const id = req.params.id;
+      if (!ObjectId.isValid(id)) return res.status(400).json({ error: "Invalid project ID" });
+      const { userEmail, description, version, files } = req.body;
+      if (!userEmail || !description) return res.status(400).json({ error: "User email and description are required" });
+
+      const project = await projectsCollection.findOne({ _id: new ObjectId(id) });
+      if (!project) return res.status(404).json({ error: "Project not found" });
+      if (!project.checkedOutBy || project.checkedOutBy.email !== userEmail) {
+        return res.status(403).json({ error: "Project not checked out by this user" });
+      }
+
+      const user = await usersCollection.findOne({ email: userEmail });
+      const userName = user ? `${user.firstName} ${user.lastName}` : userEmail;
+
+      let newVersion = version || project.version;
+      if (newVersion === project.version) {
+        const versionParts = newVersion.split('.').map(Number);
+        versionParts[2] += 1;
+        newVersion = versionParts.join('.');
+      }
+
+      const updatedFiles = [...(project.files || []), ...(files || [])];
+
+      const updatedProject = {
+        ...project,
+        files: updatedFiles,
+        version: newVersion,
+        checkedOutBy: null,
+        versionHistory: [
+          {
+            version: newVersion,
+            description: description || "Checked in project",
+            date: new Date().toISOString(),
+            modifiedBy: userName,
+          },
+          ...project.versionHistory,
+        ],
+      };
+
+      await projectsCollection.updateOne(
+        { _id: new ObjectId(id) },
+        { $set: updatedProject }
+      );
+
+      await createActivity(
+        "checkin",
+        userName,
+        userEmail,
+        project.name,
+        `${userName} checked in updates to ${project.name}`
+      );
+
+      res.json({ message: "Project checked in", project: updatedProject });
+    } catch (err) {
+      console.error("POST /projects/:id/checkin failed:", err);
+      res.status(500).json({ error: "Failed to check in project" });
+    }
+  });
+
+  // POST add member (join)
   router.post("/:id/members", async (req, res) => {
     try {
+      const id = req.params.id;
+      if (!ObjectId.isValid(id)) return res.status(400).json({ error: "Invalid project ID" });
       const { email } = req.body;
       if (!email) return res.status(400).json({ error: "Email required" });
 
-      const project = await projectsCollection.findOne({ id: parseInt(req.params.id) });
+      const project = await projectsCollection.findOne({ _id: new ObjectId(id) });
       if (!project) return res.status(404).json({ error: "Project not found" });
 
       const userToAdd = await usersCollection.findOne({ email });
@@ -118,18 +214,21 @@ export default function projectRoutes(db) {
       if (project.members.some(m => m.email === email))
         return res.status(400).json({ error: "User already a member" });
 
-      const memberObj = { id: userToAdd.id, email, name: `${userToAdd.firstName} ${userToAdd.lastName}` };
-      await projectsCollection.updateOne({ id: project.id }, { $push: { members: memberObj } });
+      const userName = `${userToAdd.firstName} ${userToAdd.lastName}`;
+      const memberObj = { _id: userToAdd._id, email, name: userName };
 
-      await activitiesCollection.insertOne({
-        actionType: "add-member",
-        user: memberObj.name,
+      await projectsCollection.updateOne(
+        { _id: project._id },
+        { $push: { members: memberObj } }
+      );
+
+      await createActivity(
+        "join",
+        userName,
         email,
-        action: "added to project",
-        projectName: project.name,
-        timestamp: new Date().toISOString(),
-        description: `${memberObj.name} added to ${project.name}`
-      });
+        project.name,
+        `${userName} joined ${project.name} as a project member`
+      );
 
       res.json({ message: "Member added", project: { ...project, members: [...project.members, memberObj] } });
     } catch (err) {
@@ -138,27 +237,121 @@ export default function projectRoutes(db) {
     }
   });
 
+  // PUT update project
+  router.put("/:id", async (req, res) => {
+    try {
+      const id = req.params.id;
+      if (!ObjectId.isValid(id)) return res.status(400).json({ error: "Invalid project ID" });
+
+      const { name, type, description, tags, image, files, version, members } = req.body;
+      if (!name || !type || !description || !version || !members?.length) {
+        return res.status(400).json({ error: "Missing required fields" });
+      }
+
+      const membersDetails = await usersCollection.find({ email: { $in: members } }).toArray();
+      if (!membersDetails.length) return res.status(400).json({ error: "Members not found" });
+
+      const ownerUser = membersDetails[0];
+      const userName = `${ownerUser.firstName} ${ownerUser.lastName}`;
+
+      const updatedProject = {
+        name,
+        type,
+        description,
+        tags: tags || [],
+        image: image || "/assets/img/placeholder.png",
+        files: files || [],
+        version,
+        owner: { _id: ownerUser._id, name: userName },
+        members: membersDetails.map(u => ({
+          _id: u._id,
+          name: `${u.firstName} ${u.lastName}`,
+          email: u.email,
+        })),
+        checkedOutBy: null,
+        versionHistory: [
+          { version, description, date: new Date().toISOString(), modifiedBy: userName },
+          ...(await projectsCollection.findOne({ _id: new ObjectId(id) }).then(p => p.versionHistory || [])),
+        ],
+      };
+
+      const result = await projectsCollection.updateOne(
+        { _id: new ObjectId(id) },
+        { $set: updatedProject }
+      );
+
+      if (result.matchedCount === 0) return res.status(404).json({ error: "Project not found" });
+
+      await createActivity(
+        "update",
+        userName,
+        ownerUser.email,
+        updatedProject.name,
+        `${userName} updated ${updatedProject.name}`
+      );
+
+      res.json({ message: "Project updated", project: { ...updatedProject, _id: id } });
+    } catch (err) {
+      console.error("PUT /projects/:id failed:", err);
+      res.status(500).json({ error: "Failed to update project" });
+    }
+  });
+
   // DELETE project
   router.delete("/:id", async (req, res) => {
     try {
-      const project = await projectsCollection.findOne({ id: parseInt(req.params.id) });
+      const id = req.params.id;
+      if (!ObjectId.isValid(id)) return res.status(400).json({ error: "Invalid project ID" });
+
+      const project = await projectsCollection.findOne({ _id: new ObjectId(id) });
       if (!project) return res.status(404).json({ error: "Project not found" });
 
-      await projectsCollection.deleteOne({ id: project.id });
-      await activitiesCollection.insertOne({
-        actionType: "delete",
-        user: project.owner.name,
-        email: project.owner.email,
-        action: "deleted a project",
-        projectName: project.name,
-        timestamp: new Date().toISOString(),
-        description: `${project.owner.name} deleted ${project.name}`
-      });
+      const user = await usersCollection.findOne({ email: project.owner.email });
+      const userName = user ? `${user.firstName} ${user.lastName}` : project.owner.email;
+
+      await projectsCollection.deleteOne({ _id: project._id });
+
+      await createActivity(
+        "delete",
+        userName,
+        project.owner.email,
+        project.name,
+        `${userName} deleted ${project.name}`
+      );
 
       res.json({ message: "Project deleted" });
     } catch (err) {
       console.error("DELETE /projects/:id failed:", err);
       res.status(500).json({ error: "Failed to delete project" });
+    }
+  });
+
+  // POST comment on project
+  router.post("/:id/comments", async (req, res) => {
+    try {
+      const id = req.params.id;
+      if (!ObjectId.isValid(id)) return res.status(400).json({ error: "Invalid project ID" });
+      const { email, comment } = req.body;
+      if (!email || !comment) return res.status(400).json({ error: "Email and comment required" });
+
+      const project = await projectsCollection.findOne({ _id: new ObjectId(id) });
+      if (!project) return res.status(404).json({ error: "Project not found" });
+
+      const user = await usersCollection.findOne({ email });
+      const userName = user ? `${user.firstName} ${user.lastName}` : email;
+
+      await createActivity(
+        "comment",
+        userName,
+        email,
+        project.name,
+        `${userName} commented on ${project.name}: ${comment}`
+      );
+
+      res.json({ message: "Comment added" });
+    } catch (err) {
+      console.error("POST /projects/:id/comments failed:", err);
+      res.status(500).json({ error: "Failed to add comment" });
     }
   });
 

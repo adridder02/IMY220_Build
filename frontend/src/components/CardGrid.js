@@ -10,23 +10,25 @@ const CardGrid = ({ projects, userEmail, onDeleteProject }) => {
 
     return (
         <div className="cards">
-            {projects.map((project) => (
-                <ProjectCards
-                    key={project.id}
-                    side={flipped[project.id] ? 'back' : 'front'}
-                    projectId={project.id}
-                    projectName={project.name}
-                    tags={project.tags.map(tag => `#${tag}`).join(' ')}
-                    description={project.description}
-                    owner={project.owner}
-                    checkedOutBy={project.checkedOutBy}
-                    userEmail={userEmail}
-                    onFlip={() => handleFlip(project.id)}
-                    onDeleteProject={onDeleteProject}
-                    members={project.members}
-                />
-
-            ))}
+            {projects.map((project) => {
+                const projectId = project._id?.toString();
+                return (
+                    <ProjectCards
+                        key={projectId}
+                        side={flipped[projectId] ? 'back' : 'front'}
+                        projectId={projectId}
+                        projectName={project.name}
+                        tags={project.tags.map(tag => `#${tag}`).join(' ')}
+                        description={project.description}
+                        owner={project.owner}
+                        checkedOutBy={project.checkedOutBy}
+                        userEmail={userEmail}
+                        onFlip={() => handleFlip(projectId)}
+                        onDeleteProject={onDeleteProject}
+                        members={project.members}
+                    />
+                );
+            })}
         </div>
     );
 };

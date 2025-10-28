@@ -50,7 +50,11 @@ const ProjectCards = ({
                     </button>
 
                     <button
-                        onClick={() => onDeleteProject(projectId)}
+                        onClick={() => {
+                            if (window.confirm(`Are you sure you want to delete ${projectName}?`)) {
+                                onDeleteProject(projectId);
+                            }
+                        }}
                         disabled={!isOwner}
                         style={{
                             opacity: isOwner ? 1 : 0.5,

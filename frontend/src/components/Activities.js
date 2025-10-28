@@ -16,7 +16,13 @@ export const ActivityType1 = ({ user, action, projectName, timestamp }) => {
   );
 };
 
+const truncateText = (text, maxLength = 100) => {
+  if (!text) return '';
+  return text.length > maxLength ? text.slice(0, maxLength) + '…' : text;
+};
+
 export const ActivityType2 = ({ user, action, projectName, timestamp, description, cardTitle, cardDescription }) => {
+  
   return (
     <div className="ActivityType2">
       <div className="left">
@@ -37,7 +43,7 @@ export const ActivityType2 = ({ user, action, projectName, timestamp, descriptio
           <img src="/assets/img/placeholder.png" alt="projectImg" />
           <div className="hLine"></div>
           <h3>{cardTitle || 'No Title'}</h3>
-          <p>{cardDescription || 'No description'}</p>
+          <p>{truncateText(cardDescription, 50) || 'No description'}</p>
         </div>
       </div>
     </div>
@@ -74,13 +80,13 @@ const Activities = ({ activities, forProject = false }) => {
           timestamp: activity.timestamp ? new Date(activity.timestamp).toLocaleString() : 'No Date',
           description: activity.description,
           cardTitle: activity.projectName,
-          cardDescription: activity.description,
+          cardDescription: activity.projectDescription,
         };
 
         if (activity.actionType === "checkout") {
           return <ActivityType1 key={activity.id} {...props} />;
         } else {
-          return forProject 
+          return forProject
             ? <ActivityType3 key={activity.id} {...props} />  // Project page
             : <ActivityType2 key={activity.id} {...props} />; // Home page
         }
