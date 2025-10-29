@@ -9,16 +9,18 @@ export default function projectRoutes(db) {
 
   // Helper function to create activity
   const createActivity = async (actionType, userName, email, projectName, description) => {
-    const verb =
-      actionType === "create" ? "created" :
-        actionType === "delete" ? "deleted" :
-          actionType === "checkin" ? "checked in" :
-            actionType === "checkout" ? "checked out" :
-              actionType === "join" ? "joined" :
-                actionType === "comment" ? "commented on" :
-                  actionType === "update" ? "updated" :
-                    actionType === "promote" ? "promoted to owner of" :
-                      "performed an action on";
+    let verb;
+    switch (actionType) {
+      case "create": verb = "created"; break;
+      case "delete": verb = "deleted"; break;
+      case "checkin": verb = "checked in"; break;
+      case "checkout": verb = "checked out"; break;
+      case "join": verb = "joined"; break;
+      case "comment": verb = "commented on"; break;
+      case "update": verb = "edited"; break;
+      case "promote": verb = "promoted to owner of"; break;
+      default: verb = "performed an action on";
+    }
 
     await activitiesCollection.insertOne({
       actionType,

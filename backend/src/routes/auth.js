@@ -7,7 +7,19 @@ export default function authRoutes(db) {
 
   // REGISTER
   router.post("/register", async (req, res) => {
-    const { email, password, confpassword, firstName, lastName } = req.body;
+    const {
+      email,
+      password,
+      confpassword,
+      firstName,
+      lastName,
+      organization = "",
+      about = "",
+      phone = "",
+      dob = "",
+      country = "",
+    } = req.body;
+
     const missing = [];
     if (!email) missing.push("email");
     if (!password) missing.push("password");
@@ -15,28 +27,51 @@ export default function authRoutes(db) {
     if (!firstName) missing.push("firstName");
     if (!lastName) missing.push("lastName");
     if (missing.length)
-      return res.status(400).json({ error: `Missing fields: ${missing.join(", ")}` });
+      return res
+        .status(400)
+        .json({ error: `Missing fields: ${missing.join(", ")}` });
 
     if (password !== confpassword)
       return res.status(400).json({ error: "Passwords do not match" });
 
-    const existingUser = await usersCollection.findOne({ email: email.toLowerCase() });
+    const existingUser = await usersCollection.findOne({
+      email: email.toLowerCase(),
+    });
     if (existingUser)
       return res.status(400).json({ error: "Email already registered" });
 
     const newUser = {
       email: email.toLowerCase(),
-      password,
+      password,                              
       firstName,
       lastName,
+      organization,
+      about,
+      phone,
+      dob,
+      country,
+      avatar: "/assets/img/placeholder.png",
+      status: true,
       friends: [],
+      friendRequests: [],
+
+      userInfo: [
+        { field: "name", value: firstName, visible: true },
+        { field: "surname", value: lastName, visible: true },
+        { field: "email", value: email.toLowerCase(), visible: false },
+        { field: "phone", value: phone, visible: false },
+        { field: "dob", value: dob, visible: false },
+        { field: "country", value: country, visible: false },
+        { field: "organization", value: organization, visible: false },
+        { field: "about", value: about, visible: false },
+      ],
     };
 
     const result = await usersCollection.insertOne(newUser);
 
     res.status(201).json({
       message: "Registration successful",
-      userId: result.insertedId, // ObjectId
+      userId: result.insertedId,
     });
   });
 
