@@ -199,7 +199,7 @@ const ProfilePage = () => {
                     className={activeSection === 'Prof' ? 'active' : ''}
                     onClick={() => handleButtonClick('Prof')}
                 >
-                    Prof
+                    <img src="/assets/icons/profile.svg" alt="Profile Icon" className='icon' />
                 </button>
 
                 {/*  only for owner or friends */}
@@ -209,18 +209,21 @@ const ProfilePage = () => {
                             className={activeSection === 'Actv' ? 'active' : ''}
                             onClick={() => handleButtonClick('Actv')}
                         >
-                            Actv
+                            <img src="/assets/icons/activity.svg" alt="Activity Icon" className='icon' />
                         </button>
                         <button
                             className={activeSectionSide === 'Proj' ? 'active' : ''}
                             onClick={() => handleButtonClickSide('Proj')}
-                        >Proj</button>
+                        >
+                            <img src="/assets/icons/project.svg" alt="Project Icon" className='icon' />
+                        </button>
                     </>
                 )}
                 <button
                     className={activeSectionSide === 'Frie' ? 'active' : ''}
                     onClick={() => handleButtonClickSide('Frie')}
-                >Frie
+                >
+                    <img src="/assets/icons/friends.svg" alt="Friends Icon" className='icon' />
                 </button>
             </div>
 

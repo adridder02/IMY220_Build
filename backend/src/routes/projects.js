@@ -152,27 +152,41 @@ export default function projectRoutes(db) {
   router.post("/:id/checkin", async (req, res) => {
     try {
       const id = req.params.id;
-      if (!ObjectId.isValid(id)) return res.status(400).json({ error: "Invalid project ID" });
+      if (!ObjectId.isValid(id))
+        return res.status(400).json({ error: "Invalid project ID" });
+
       const { userEmail, description, version, files } = req.body;
-      if (!userEmail || !description) return res.status(400).json({ error: "User email and description are required" });
+      if (!userEmail || !description)
+        return res
+          .status(400)
+          .json({ error: "User email and description are required" });
 
       const project = await projectsCollection.findOne({ _id: new ObjectId(id) });
       if (!project) return res.status(404).json({ error: "Project not found" });
+
       if (!project.checkedOutBy || project.checkedOutBy.email !== userEmail) {
-        return res.status(403).json({ error: "Project not checked out by this user" });
+        return res
+          .status(403)
+          .json({ error: "Project not checked out by this user" });
       }
 
       const user = await usersCollection.findOne({ email: userEmail });
       const userName = user ? `${user.firstName} ${user.lastName}` : userEmail;
 
+      // Determine new version
       let newVersion = version || project.version;
       if (newVersion === project.version) {
         const versionParts = newVersion.split('.').map(Number);
-        versionParts[2] += 1;
+        versionParts[2] += 1; // increment patch
         newVersion = versionParts.join('.');
       }
 
-      const updatedFiles = [...(project.files || []), ...(files || [])];
+      // Filter out duplicate files
+      const existingFiles = project.files || [];
+      const newFiles = (files || []).filter(
+        (f) => !existingFiles.some((existing) => existing.path === f.path)
+      );
+      const updatedFiles = [...existingFiles, ...newFiles];
 
       const updatedProject = {
         ...project,
@@ -186,7 +200,7 @@ export default function projectRoutes(db) {
             date: new Date().toISOString(),
             modifiedBy: userName,
           },
-          ...project.versionHistory,
+          ...(project.versionHistory || []),
         ],
       };
 
@@ -209,6 +223,7 @@ export default function projectRoutes(db) {
       res.status(500).json({ error: "Failed to check in project" });
     }
   });
+
 
   // POST add member (join)
   router.post("/:id/members", async (req, res) => {

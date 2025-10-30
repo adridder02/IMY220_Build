@@ -88,6 +88,7 @@ div.mainCol button.active {
     margin: 0 auto;
     margin-top: 1vw;
     border: 2px solid var(--secondary);
+    object-fit: cover;
 }
 
 /* Word Cloud */

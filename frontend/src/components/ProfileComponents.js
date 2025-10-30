@@ -158,13 +158,31 @@ export const FriendsSection = ({ profileId, currentUserId }) => {
             try {
                 const res = await fetch(`/api/users/${profileId}`);
                 const data = await res.json();
-                setFriendRequests(data.friendRequests?.map(r => ({ ...r, _id: r._id.toString() })) || []);
+
+                const requestsWithData = await Promise.all(
+                    (data.friendRequests || []).map(async id => {
+                        const r = await fetch(`/api/users/${id}`);
+                        const user = await r.json();
+                        return {
+                            _id: id,
+                            firstName: user.firstName,
+                            lastName: user.lastName,
+                            email: user.email,
+                            avatar: user.avatar || "/assets/img/placeholder.png"
+                        };
+                    })
+                );
+
+                setFriendRequests(requestsWithData);
             } catch (err) {
                 console.error(err);
+                setFriendRequests([]);
             }
         };
+
         fetchRequests();
     }, [profileId, isOwner]);
+
 
     // fetch friends dynamically
     useEffect(() => {
@@ -226,6 +244,7 @@ export const FriendsSection = ({ profileId, currentUserId }) => {
             const data = await res.json();
             setFriends(data.friends || []);
             setFriendRequests(prev => prev.filter(r => r._id !== senderId));
+            window.location.reload();
         } catch (err) {
             console.error(err);
             alert(err.message);
@@ -238,6 +257,7 @@ export const FriendsSection = ({ profileId, currentUserId }) => {
             const res = await fetch(`/api/users/${profileId}/friend-request/${senderId}/reject`, { method: "POST" });
             if (!res.ok) throw new Error("Failed to reject request");
             setFriendRequests(prev => prev.filter(r => r._id !== senderId));
+            window.location.reload();
         } catch (err) {
             console.error(err);
             alert(err.message);
@@ -251,6 +271,7 @@ export const FriendsSection = ({ profileId, currentUserId }) => {
             if (!res.ok) throw new Error("Failed to remove friend");
             const data = await res.json();
             setFriends(data.friends || []);
+            window.location.reload();
         } catch (err) {
             console.error(err);
             alert(err.message);

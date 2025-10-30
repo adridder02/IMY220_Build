@@ -5,22 +5,7 @@ const avatarCache = new Map();
 const fetchAvatar = async (userId) => {
   if (!userId) return "/assets/img/placeholder.png";
 
-  // check cache first
-  if (avatarCache.has(userId)) return avatarCache.get(userId);
-
-  // check localStorage
-  const cached = localStorage.getItem(`avatar_${userId}`);
-  if (cached) {
-    const { url, timestamp } = JSON.parse(cached);
-    // expire after 7 days
-    if (Date.now() - timestamp < 7 * 24 * 60 * 60 * 1000) {
-      avatarCache.set(userId, url);
-      return url;
-    }
-  }
-
-  // fetch from server
-  let url = "/assets/img/placeholder.png"; 
+  let url = "/assets/img/placeholder.png";
   try {
     let res, data;
 
@@ -34,26 +19,18 @@ const fetchAvatar = async (userId) => {
       data = await res.json();
       url = data.avatar || url;
     } else if (res.status === 404) {
-      // user deleted, keep fallback
       console.warn(`User not found: ${userId}`);
     } else {
       throw new Error(`Failed to fetch avatar: ${res.status}`);
     }
 
-    // cache in memory + localStorage
-    avatarCache.set(userId, url);
-    localStorage.setItem(`avatar_${userId}`, JSON.stringify({
-      url,
-      timestamp: Date.now()
-    }));
-
     return url;
   } catch (err) {
     console.error("Avatar fetch failed:", err);
-    avatarCache.set(userId, url);
     return url;
   }
 };
+
 
 
 export const ActivityType1 = ({ avatarUrl, user, action, projectName, timestamp }) => {

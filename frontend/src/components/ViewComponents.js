@@ -331,8 +331,12 @@ export const ViewProject = ({ project, userEmail, onProjectUpdated }) => {
           >
             {checkButtonLabel}
           </button>
-          <button onClick={handleDownload}>Download All</button>
-          <button onClick={() => setActiveView("chat")}>Chat</button>
+          <button onClick={handleDownload}>
+            <img src="/assets/icons/download.svg" alt="Download Icon" className='icon3' />
+          </button>
+          <button onClick={() => setActiveView("chat")}>
+            <img src="/assets/icons/chat.svg" alt="Chat Icon" className='icon2' />
+          </button>
           {isOwner && (
             <button className="editButton" onClick={() => setActiveView("edit")}>
               Edit
@@ -385,6 +389,19 @@ export const ViewProject = ({ project, userEmail, onProjectUpdated }) => {
         {activeView === "chat" && (
           <div className="chatPanel">
             <h3 className="heading3">Project Chat</h3>
+            <div className="commentList">
+              {currentProject.activities
+                ?.filter((a) => a.actionType === "comment")
+                .map((activity) => (
+                  <div key={activity.id} className="comment">
+                    <p>
+                      <strong>{activity.user}</strong> ({activity.email}) at{" "}
+                      {new Date(activity.timestamp).toLocaleString()}
+                    </p>
+                    <p>{activity.description.split(": ")[1] || activity.description}</p>
+                  </div>
+                ))}
+            </div>
             <form onSubmit={handleCommentSubmit}>
               <div className="commentInput">
                 <textarea
@@ -399,20 +416,6 @@ export const ViewProject = ({ project, userEmail, onProjectUpdated }) => {
               {commentError && <p style={{ color: "red" }}>{commentError}</p>}
             </form>
 
-            <div className="commentList">
-              {currentProject.activities
-                ?.filter((a) => a.actionType === "comment")
-                .map((activity) => (
-                  <div key={activity.id} className="comment">
-                    <p>
-                      <strong>{activity.user}</strong> ({activity.email}) at{" "}
-                      {new Date(activity.timestamp).toLocaleString()}
-                    </p>
-                    <p>{activity.description.split(": ")[1] || activity.description}</p>
-                  </div>
-                ))}
-            </div>
-
             <button onClick={() => setActiveView("file")}>Close</button>
           </div>
         )}
@@ -421,7 +424,6 @@ export const ViewProject = ({ project, userEmail, onProjectUpdated }) => {
           <div className="fileDisplay">
             {currentProject.files && currentProject.files.length > 0 ? (
               <>
-                <h4>{currentProject.files[0].name}</h4>
                 {loadingFile ? (
                   <p>Loading...</p>
                 ) : (

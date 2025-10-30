@@ -98,6 +98,21 @@ section {
     min-height: 30vw;
 }
 
+.icon {
+    width: 2vw;
+    margin-top: 0.3vw;
+}
+
+.icon2 {
+    width: 2vw;
+}
+
+.icon3 {
+    width: 1.5vw;
+    margin: 0 auto;
+    margin-left: 4px;
+}
+
 /*Headers*/
 
 body#splash header img {
@@ -322,12 +337,25 @@ div#searchBar ul.suggestionsList {
     left: 0;
     right: 0;
     z-index: 1000;
-    background-color: green;
+    border-radius: 30px;
+    padding: 2vw;
+    padding-top: 1vw;
 }
 
 div#searchBar ul.suggestionsList li {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    background-color: blue;
+    cursor: pointer;
+    padding: 1vw;
+    background-color: var(--secondary);
+    color: var(--primary);
+    border-radius: 30px;
+    transition: 0.5s;
+    margin-top: 1vw;
+}
+
+div#searchBar ul.suggestionsList li:hover {
+    background-color: var(--primary);
+    color: var(--secondary);
 }

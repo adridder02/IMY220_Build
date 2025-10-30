@@ -325,3 +325,9 @@
     margin-top: 2.5vw;
     margin-bottom: 1.5vw;
 }
+
+.fileButtons .active {
+    text-decoration: none;
+    background-color: var(--secondary);
+    color: var(--primary);
+}

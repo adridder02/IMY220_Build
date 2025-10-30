@@ -124,7 +124,6 @@ export const CreateProject = ({ onClose, onProjectCreated }) => {
                 {error && <p style={{ color: 'red' }}>{error}</p>}
 
                 <div className="uploadArea">
-                    <label>Project Image</label>
                     <div
                         className="imageUploader"
                         onClick={() => document.getElementById('projectImageInput').click()}
@@ -188,9 +187,9 @@ export const CheckInProject = ({ projectId, userEmail, onCheckIn, onClose }) => 
     const [formData, setFormData] = useState({
         description: '',
         version: '',
-        files: [],
+        files: [], 
     });
-    const [fileObjects, setFileObjects] = useState([]);
+    const [fileObjects, setFileObjects] = useState([]); 
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(true);
 
@@ -215,14 +214,15 @@ export const CheckInProject = ({ projectId, userEmail, onCheckIn, onClose }) => 
     }, [projectId]);
 
     const handleInputChange = (field, value) => {
-        setFormData((prev) => ({ ...prev, [field]: value }));
+        setFormData(prev => ({ ...prev, [field]: value }));
     };
 
     const handleAddFile = (file) => {
         if (!file) return;
-        setFormData((prev) => ({ ...prev, files: [...prev.files, file] }));
         if (file instanceof File) {
-            setFileObjects(prev => [...prev, file]);
+            setFileObjects(prev => [...prev, file]); 
+        } else {
+            setFormData(prev => ({ ...prev, files: [...prev.files, file] })); 
         }
     };
 
@@ -233,24 +233,25 @@ export const CheckInProject = ({ projectId, userEmail, onCheckIn, onClose }) => 
         const res = await fetch('/api/projects/upload-files', { method: 'POST', body: form });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'Files upload failed');
-        return data.files;
+        return data.files; 
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
+
+        if (!formData.description) {
+            setError('Description is required');
+            return;
+        }
+
         try {
-            // upload any new file objects first
             const uploadedFiles = await uploadFiles(fileObjects);
 
-            // combine previously added files and newly uploaded files
-            const existingFiles = formData.files.filter(f => typeof f === 'string' || f.path);
+            const existingFiles = formData.files.filter(f => !uploadedFiles.includes(f));
             const allFiles = [...existingFiles, ...uploadedFiles];
 
-            if (!formData.description) {
-                setError('Description is required');
-                return;
-            }
+            setFileObjects([]);
 
             const response = await fetch(`/api/projects/${projectId}/checkin`, {
                 method: 'POST',
@@ -272,7 +273,6 @@ export const CheckInProject = ({ projectId, userEmail, onCheckIn, onClose }) => 
             setError(err.message);
         }
     };
-
 
     if (loading) return <div>Loading...</div>;
     if (error) return <div>Error: {error}</div>;
@@ -299,7 +299,7 @@ export const CheckInProject = ({ projectId, userEmail, onCheckIn, onClose }) => 
                             />
                         </div>
                         <div className="rightCol">
-                            <AddFiles files={formData.files} onAddFile={handleAddFile} />
+                            <AddFiles files={[...formData.files, ...fileObjects]} onAddFile={handleAddFile} />
                         </div>
                     </div>
                     <div id="buttonContainer">
@@ -310,6 +310,7 @@ export const CheckInProject = ({ projectId, userEmail, onCheckIn, onClose }) => 
         </div>
     );
 };
+
 
 export const EditProject = ({ projectId, onClose, onProjectUpdate }) => {
     const { user } = useContext(UserContext);
@@ -477,7 +478,6 @@ export const EditProject = ({ projectId, onClose, onProjectUpdate }) => {
                 <div className="timestamp">{new Date().toLocaleString()}</div>
 
                 <div className="uploadArea">
-                    <label>Project Image</label>
                     <div
                         className="imageUploader"
                         onClick={() => document.getElementById('editProjectImageInput').click()}

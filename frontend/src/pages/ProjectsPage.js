@@ -72,7 +72,6 @@ const ProjectsPage = () => {
                 All Projects
               </button>
             </div>
-            <Sort value={sort} onChange={(e) => setSort(e.target.value)} />
           </div>
           <CardGrid
             projects={projects}

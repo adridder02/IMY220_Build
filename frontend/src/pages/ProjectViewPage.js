@@ -64,10 +64,10 @@ const ProjectViewPage = () => {
             <div className="menu">
                 <h3 className="heading3">Menu</h3>
                 <button className={activeView === "Proj" ? "active" : ""} onClick={() => handleButtonClick("Proj")}>
-                    Proj
+                    <img src="/assets/icons/project.svg" alt="Project Icon" className='icon'/>
                 </button>
                 <button className={activeView === "Actv" ? "active" : ""} onClick={() => handleButtonClick("Actv")}>
-                    Actv
+                    <img src="/assets/icons/activity.svg" alt="Activity Icon" className='icon'/>
                 </button>
                 <div className="hLine"></div>
                 <button onClick={() => window.history.back()}>Back</button>

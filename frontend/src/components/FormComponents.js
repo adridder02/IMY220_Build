@@ -34,7 +34,7 @@ export const Description = ({ value, onChange }) => {
         <div>
             <label>Description</label>
             <textarea
-                placeholder="Describe your Project"
+                placeholder="Enter description"
                 value={value}
                 onChange={onChange}
             />

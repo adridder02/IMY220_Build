@@ -81,16 +81,19 @@ const AppNav = () => {
         />
         {loading && <p>Loading...</p>}
         {suggestions.length > 0 && (
-          <ul className="suggestionsList" >
+          <ul className="suggestionsList">
             {suggestions.map(item => (
-              <li key={item.id + item.type} className="suggestionItem">
+              <li
+                key={item.id + item.type}
+                className="suggestionItem"
+                onClick={() => handleView(item)}
+              >
                 <span className="suggestionText">
                   {item.type === 'user'
                     ? `${item.firstName} ${item.lastName} (${item.email})`
                     : item.name
                   }
                 </span>
-                <button onClick={() => handleView(item)}>View</button>
               </li>
             ))}
           </ul>

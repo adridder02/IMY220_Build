@@ -98,6 +98,7 @@ img.avatar {
     height: 5.5vw;
     border-radius: 50px;
     border: 2px solid var(--secondary);
+    object-fit: cover;
 }
 
 .ActivityType1 {

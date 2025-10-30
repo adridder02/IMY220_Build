@@ -1,0 +1,307 @@
+:root[data-theme="dark"] {
+    --text: #191a2e;
+    --primary: #fcf4e9;
+    --secondary: #191a2e;
+    --tertiary: #0f3461;
+    --accent: #f66b0e;
+}
+
+:root[data-theme="light"] {
+     --text: #191a2e;
+    --primary: #fcf4e9;
+    --secondary: #191a2e;
+    --tertiary: #0f3461;
+    --accent: #f66b0e;
+}
+
+@font-face {
+    font-family: Headings;
+    src: url(fonts/AstrogatorBB.ttf);
+}
+
+@font-face {
+    font-family: General;
+    src: url(fonts/PerihelionBB-Bold.ttf);
+}
+
+* {
+    font-family: General;
+    color: var(--text);
+    border-color: var(--text);
+}
+
+html {
+    background: #191A2E;
+    background: linear-gradient(180deg, var(--secondary) 0%, var(--tertiary) 100%);
+    background-repeat: no-repeat;
+    min-height: 100vh;
+    overflow-x: clip;
+}
+
+/*Grid */
+
+.grid-container {
+    display: grid;
+    grid-template:
+        "search search search" auto
+        "form vLine cards" 1fr 0.5fr 2fr;
+    grid-template-areas:
+        "search search search"
+        "form vLine cards";
+    column-gap: 5vw;
+    align-content: center;
+    padding: 0 4vw 5vw 5vw;
+
+}
+
+
+#searchBar {
+    grid-area: search;
+}
+
+.cards {
+    grid-area: cards;
+    text-align: center;
+}
+
+.form {
+    grid-area: form;
+    height: max-content;
+}
+
+.line {
+    grid-area: vLine;
+    background-color: var(--primary);
+    width: 2px;
+    margin: 0 auto;
+}
+
+/*Form*/
+.form {
+    background-color: var(--primary);
+    color: var(--secondary);
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    width: 20vw;
+    border-radius: 30px;
+    padding: 1.5vw 2vw 1.5vw 2vw;
+    position: sticky;
+    top: 0;
+}
+
+.form h2 {
+    color: var(--accent);
+    border-bottom: 3px solid var(--accent);
+    text-align: center;
+    width: 55%;
+    line-height: 2.5vw;
+    font-family: Headings;
+    font-size: 36px;
+    margin-bottom: 5%;
+}
+
+form {
+    width: 100%;
+}
+
+form div {
+    display: flex;
+    flex-direction: column;
+    line-height: 2.5vw;
+    font-size: 24px;
+}
+
+form label {
+    margin-left: 1.5vw;
+}
+
+form input {
+    border-radius: 20px;
+    padding: 4%;
+    background-color: var(--primary);
+    margin-bottom: 2%;
+    border-width: 2px;
+    font-size: 18px;
+    padding-left: 1.5vw;
+}
+
+/* Form Dropdown */
+div.sort select {
+    -webkit-appearance: none;
+    appearance: none;
+    border-radius: 20px;
+    padding: 4%;
+    background-color: var(--primary);
+    font-size: 18px;
+    border-width: 2px;
+    border-color: var(--secondary);
+    transition: 0.5s;
+    margin-bottom: 2%;
+    padding-left: 1.5vw;
+
+}
+
+div.sort .select-wrapper {
+    position: relative;
+}
+
+div.sort .select-wrapper::after {
+    content: "\25BC";
+    top: 8.5%;
+    right: 3%;
+    position: absolute;
+    padding-right: 1vw;
+    padding-left: 0.5vw;
+    transition: 0.5s;
+    font-size: 18px;
+}
+
+div.sort select:hover,
+.select-wrapper:hover {
+    color: var(--accent);
+    cursor: pointer;
+    border-color: var(--accent);
+}
+
+div#button-container {
+    border-top: 2px solid var(--secondary);
+    padding-top: 8%;
+    margin-top: 6%;
+
+}
+
+/*Form Button*/
+form button {
+    border-radius: 30px;
+    padding: 4%;
+    background-color: var(--accent);
+    color: var(--primary);
+    margin-bottom: 2%;
+    border-width: 2px;
+    font-size: 24px;
+    padding-left: 1.5vw;
+    width: 100%;
+    transition: 0.5s;
+}
+
+form button:hover {
+    cursor: pointer;
+    background-color: var(--secondary);
+
+}
+
+
+/*Search Bar*/
+
+#searchBar {
+    width: 26vw;
+    display: flex;
+    flex-direction: row;
+    border-radius: 40px;
+    padding: 0.8vw 0.5vw 0.8vw 0.5vw;
+    padding-left: 3%;
+    margin: 0 auto;
+
+    border-radius: 30px;
+    background-color: var(--secondary);
+    border: 3px solid var(--primary);
+    margin-bottom: 4vw;
+    margin-top: 3vw;
+}
+
+#searchBar input::placeholder {
+    color: var(--primary) !important;
+}
+
+div#searchBar input {
+    all: unset;
+    width: 100%;
+    flex: 4;
+    color: var(--primary) !important;
+    font-size: 16px;
+
+}
+
+.searchIcon {
+    width: 20px;
+    height: 20px;
+    padding-left: 1.5vw;
+    margin-top: 10px;
+}
+
+/*Cards*/
+
+.cards {
+    all: unset;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    width: 50vw;
+    font-size: 18px;
+    justify-content: space-between;
+    gap: 3vw;
+}
+
+.cards>div {
+    background-color: var(--primary);
+    text-align: center;
+    border-radius: 30px;
+    padding: 1.5vw 2vw 1.5vw 2vw;
+    width: 18vw;
+    height: max-content;
+
+}
+
+.cards h3 {
+    color: var(--accent);
+    font-family: Headings;
+    font-size: 32px;
+}
+
+.cards p {
+    width: 85%;
+    margin: 0 auto;
+    border-top: 1.5px solid var(--secondary);
+    padding: 5%;
+}
+
+.cards p:last-of-type {
+    border-bottom: 1.5px solid var(--secondary);
+    color: var(--accent);
+    margin-bottom: 1.5vw;
+
+}
+
+/* Card Buttons */
+.cards button {
+    border-radius: 30px;
+    padding: 4%;
+    background-color: var(--primary);
+    color: var(--secondary);
+    margin-bottom: 4%;
+    border-width: 2px;
+    padding-left: 1.5vw;
+    border: 2px solid var(--secondary);
+    width: 90%;
+    font-size: 18px;
+    transition: 0.5s;
+}
+
+.cards button:hover {
+    cursor: pointer;
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.cards button:last-of-type {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.cards button:last-of-type:hover {
+    border-color: var(--secondary);
+    color: var(--primary);
+    background-color: var(--accent);
+}
