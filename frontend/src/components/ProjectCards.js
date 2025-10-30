@@ -12,7 +12,8 @@ const ProjectCards = ({
     checkedOutBy,
     userEmail,
     onDeleteProject,
-    members
+    members,
+    image = '/assets/img/placeholder.png'   
 }) => {
 
     const isOwner = owner?.email === userEmail;
@@ -22,7 +23,7 @@ const ProjectCards = ({
             {side === 'front' ? (
                 <div className="cardFront">
                     <div className="projectImg">
-                        <img src="assets/img/placeholder.png" alt="projectImg" />
+                        <img src={image} alt={projectName || "project"} />
                         <div className="imgAddon">
                             <button className="info" type="button" onClick={onFlip}>i</button>
                         </div>
@@ -37,7 +38,7 @@ const ProjectCards = ({
             ) : (
                 <div className="cardBack">
                     <div className="projectImg">
-                        <img src="assets/img/placeholder.png" alt="projectImg" />
+                        <img src={image} alt={projectName || "project"} />
                         <div className="imgAddon">
                             <button className="info" type="button" onClick={onFlip}>i</button>
                         </div>

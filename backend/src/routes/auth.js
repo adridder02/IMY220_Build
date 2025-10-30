@@ -5,7 +5,7 @@ export default function authRoutes(db) {
   const router = express.Router();
   const usersCollection = db.collection("users");
 
-  // REGISTER
+  // register
   router.post("/register", async (req, res) => {
     const {
       email,
@@ -75,7 +75,7 @@ export default function authRoutes(db) {
     });
   });
 
-  // LOGIN
+  // login
   router.post("/login", async (req, res) => {
     const { email, password } = req.body;
     if (!email || !password)

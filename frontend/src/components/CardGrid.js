@@ -26,6 +26,7 @@ const CardGrid = ({ projects, userEmail, onDeleteProject }) => {
                         onFlip={() => handleFlip(projectId)}
                         onDeleteProject={onDeleteProject}
                         members={project.members}
+                        image={project.image || '/assets/img/placeholder.png'}
                     />
                 );
             })}

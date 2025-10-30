@@ -42,7 +42,19 @@ const HomePage = () => {
                 const response = await fetch(`/api/activities?${params}`);
                 if (!response.ok) throw new Error('Failed to fetch activities');
                 const data = await response.json();
-                setActivities(data || []);
+
+                const activitiesWithUserId = (data || []).map(act => {
+                    const userObj = act.user || {};
+                    const userId = userObj._id || act.email;
+
+                    return {
+                        ...act,
+                        userId,
+                        user: userObj.name || act.user || 'Unknown User',
+                    };
+                });
+
+                setActivities(activitiesWithUserId);
             } catch (error) {
                 console.error('Error fetching activities:', error);
                 setActivities([]);

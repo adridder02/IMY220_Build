@@ -1,7 +1,7 @@
 import React from 'react';
 import Activities from '../components/Activities';
 import { useParams, Link } from "react-router-dom";
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect, useContext, useRef } from 'react';
 import { UserContext } from '../Session';
 
 export const ProfileSection = ({ userInfo }) => {
@@ -119,13 +119,18 @@ export const EditProfile = ({ userInfo, setUserInfo, onDelete }) => {
 };
 
 export const ActivitySection = ({ activities = [] }) => {
+    const activitiesWithUserId = activities.map(act => ({
+        ...act,
+        userId: act.user?._id || act.email || act.userId,
+        user: act.user?.name || act.user || 'Unknown User'
+    }));
+
     return (
         <div className="profileActivity">
-            <Activities activities={activities} forProject={true} />
+            <Activities activities={activitiesWithUserId} forProject={true} />
         </div>
     );
 };
-
 
 export const WordCloud = () => {
     return (
@@ -145,7 +150,7 @@ export const FriendsSection = ({ profileId, currentUserId }) => {
     const [loading, setLoading] = useState(false);
     const [friendRequests, setFriendRequests] = useState([]);
 
-    // Fetch friend requests (if owner)
+    // fetch friend requests (if owner)
     useEffect(() => {
         if (!isOwner) return;
 
@@ -161,7 +166,7 @@ export const FriendsSection = ({ profileId, currentUserId }) => {
         fetchRequests();
     }, [profileId, isOwner]);
 
-    // Fetch friends dynamically
+    // fetch friends dynamically
     useEffect(() => {
         const fetchFriends = async () => {
             try {
@@ -332,14 +337,17 @@ export const Friend = ({ friend, onRemove }) => {
     );
 };
 
-
 export const ProjectSection = ({ projects = [] }) => {
     return (
         <div className="projectSection">
             <h2 className="heading3">Current Projects</h2>
             <div className="projectList">
                 {projects.map(proj => (
-                    <CardMini key={proj.id} project={proj} />
+                    <CardMini
+                        key={proj._id || proj.id}
+                        project={proj}
+                        image={proj.image || '/assets/img/placeholder.png'}   
+                    />
                 ))}
             </div>
             <div className="hLine"></div>
@@ -348,17 +356,89 @@ export const ProjectSection = ({ projects = [] }) => {
     );
 };
 
-
-export const CardMini = ({ project }) => {
+export const CardMini = ({ project, image }) => {
     return (
         <div className="cardMini">
-            <img src={"/assets/img/placeholder.png"} alt="projectImg" />
+            <img src={image || '/assets/img/placeholder.png'} alt={project.name} />
             <div className="hLine"></div>
             <h3>{project.name}</h3>
             <div className="hLine"></div>
             <button>
                 <Link to={`/projects/${project._id}`}>View</Link>
             </button>
+        </div>
+    );
+};
+
+export const AvatarUpload = ({ currentAvatar, userId, onAvatarChange }) => {
+    const [preview, setPreview] = useState(currentAvatar);
+    const fileInput = useRef();
+
+    const upload = async (file) => {
+        const form = new FormData();
+        form.append('avatar', file);
+
+        const res = await fetch('/api/upload-avatar', {
+            method: 'POST',
+            body: form
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Upload failed');
+
+        // uetch curr userInfo
+        const userRes = await fetch(`/api/users/${userId}`);
+        const userData = await userRes.json();
+
+        // update with both userInfo and avatar
+        await fetch(`/api/users/${userId}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                userInfo: userData.userInfo || [],
+                avatar: data.url
+            })
+        });
+
+        return data.url;
+    };
+
+    const handleFile = async (file) => {
+        if (!file?.type.startsWith('image/')) return;
+        const url = URL.createObjectURL(file);
+        setPreview(url);
+        try {
+            const savedUrl = await upload(file);
+            setPreview(savedUrl);
+            onAvatarChange?.(savedUrl);
+        } catch (e) {
+            setPreview(currentAvatar);
+            alert(e.message);
+        }
+    };
+
+    const stop = e => { e.preventDefault(); e.stopPropagation(); };
+
+    return (
+        <div
+            className="avatarUploader"
+            onClick={() => fileInput.current.click()}
+            onDragOver={e => { stop(e); e.currentTarget.classList.add('drag'); }}
+            onDragLeave={e => { stop(e); e.currentTarget.classList.remove('drag'); }}
+            onDrop={e => {
+                stop(e);
+                e.currentTarget.classList.remove('drag');
+                const file = e.dataTransfer.files[0];
+                if (file) handleFile(file);
+            }}
+        >
+            <img src={preview} alt="pfp" className="pfp" />
+            <input
+                ref={fileInput}
+                type="file"
+                accept="image/*"
+                style={{ display: 'none' }}
+                onChange={e => e.target.files[0] && handleFile(e.target.files[0])}
+            />
         </div>
     );
 };

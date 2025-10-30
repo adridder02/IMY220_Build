@@ -124,8 +124,6 @@ export const AddFiles = ({ files, onAddFile }) => {
     );
 };
 
-
-
 export const Version = ({ value, onChange }) => {
     return (
         <div className="version">
@@ -155,7 +153,6 @@ export const Member = ({ member, isOwner, onPromote, onRemove }) => {
         </div>
     );
 };
-
 
 export const ManageMembers = ({ members = [], onRemove, onPromote }) => {
     if (!members || members.length === 0) {
@@ -201,8 +198,6 @@ export const ManageMembers = ({ members = [], onRemove, onPromote }) => {
         </div>
     );
 };
-
-
 
 export const VersionHistory = ({ versionHistory }) => {
     return (

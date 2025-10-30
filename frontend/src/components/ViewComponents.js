@@ -15,6 +15,12 @@ export const ViewActivity = ({ project, activities = [] }) => {
         setActiveView(prev => (prev === "mem" ? "hist" : "mem"));
     };
 
+    const activitiesWithUserId = activities.map(act => ({
+        ...act,
+        userId: act.user?._id || act.email || act.userId,
+        user: act.user?.name || act.user || 'Unknown User'
+    }));
+
     return (
         <>
             <div className='bar'>
@@ -43,7 +49,7 @@ export const ViewActivity = ({ project, activities = [] }) => {
             <div className='rightSect'>
                 <h3 className="heading3">Project Activity</h3>
                 <div className="viewActivity">
-                    <Activities activities={activities} forProject={true} />
+                    <Activities activities={activitiesWithUserId} forProject={true} />
                 </div>
             </div>
         </>
@@ -55,6 +61,7 @@ export const ViewMembers = ({ members = [], setMembers, profileId, currentUserId
     const [suggestions, setSuggestions] = useState([]);
     const [loading, setLoading] = useState(false);
     const [friends, setFriends] = useState([]);
+    const [avatarMap, setAvatarMap] = useState({});
 
     const canEdit = profileId === currentUserId;
 
@@ -68,6 +75,25 @@ export const ViewMembers = ({ members = [], setMembers, profileId, currentUserId
             .catch(console.error)
             .finally(() => setLoading(false));
     }, [currentUserId, canEdit]);
+
+    useEffect(() => {
+        const loadAvatars = async () => {
+            const map = {};
+            for (const member of members) {
+                const userId = member.id || member._id;
+                if (!userId) continue;
+                try {
+                    const res = await fetch(`/api/users/${userId}`);
+                    const data = await res.json();
+                    map[userId] = data.avatar || "/assets/img/placeholder.png";
+                } catch {
+                    map[userId] = "/assets/img/placeholder.png";
+                }
+            }
+            setAvatarMap(map);
+        };
+        if (members.length > 0) loadAvatars();
+    }, [members]);
 
     const handleInputChange = (e) => {
         if (!canEdit) return;
@@ -144,24 +170,28 @@ export const ViewMembers = ({ members = [], setMembers, profileId, currentUserId
                 </ul>
             )}
 
-            {members.map((member, idx) => (
-                <div className="member" key={member.id ?? member.email ?? idx}>
-                    <img
-                        src={member.avatar || "/assets/img/placeholder.png"}
-                        alt="userPfp"
-                        className="avatar"
-                    />
-                    <div className="userInfo">
-                        <p>{member.name || `${member.firstName} ${member.lastName}`}</p>
-                        <div className="hLine"></div>
-                        <p>{member.email}</p>
+            {members.map((member, idx) => {
+                const userId = member.id || member._id;
+                const avatar = avatarMap[userId] || "/assets/img/placeholder.png";
+                return (
+                    <div className="member" key={userId ?? member.email ?? idx}>
+                        <img
+                            src={avatar}
+                            alt="userPfp"
+                            className="avatar"
+                        />
+                        <div className="userInfo">
+                            <p>{member.name || `${member.firstName} ${member.lastName}`}</p>
+                            <div className="hLine"></div>
+                            <p>{member.email}</p>
+                        </div>
+                        <div className="vLine"></div>
+                        <button>
+                            <Link to={`/profile/${userId}`}>View</Link>
+                        </button>
                     </div>
-                    <div className="vLine"></div>
-                    <button>
-                        <Link to={`/profile/${member.id}`}>View</Link>
-                    </button>
-                </div>
-            ))}
+                );
+            })}
 
             {members.length === 0 && <p>No members found</p>}
         </div>
@@ -169,184 +199,223 @@ export const ViewMembers = ({ members = [], setMembers, profileId, currentUserId
 };
 
 export const ViewProject = ({ project, userEmail }) => {
-    const [activeView, setActiveView] = useState("file");
-    const [currentProject, setCurrentProject] = useState({
-        ...project,
-        _id: project._id?.toString(),
-    });
-    const [commentInput, setCommentInput] = useState("");
-    const [commentError, setCommentError] = useState("");
-    const isOwnerOrMember =
-        project.owner?.email === userEmail || project.members?.some(m => m.email === userEmail);
+  const [activeView, setActiveView] = useState("file");
+  const [currentProject, setCurrentProject] = useState({
+    ...project,
+    _id: project._id?.toString(),
+  });
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [fileContent, setFileContent] = useState("");
+  const [loadingFile, setLoadingFile] = useState(false);
+  const [commentInput, setCommentInput] = useState("");
+  const [commentError, setCommentError] = useState("");
 
-    const isOwner =
-        project.owner?.email === userEmail;
+  const isOwnerOrMember =
+    project.owner?.email === userEmail ||
+    project.members?.some((m) => m.email === userEmail);
+  const isOwner = project.owner?.email === userEmail;
 
-    const toggleRight = (view) => setActiveView(view);
+  let checkButtonLabel;
+  let checkButtonDisabled = false;
 
-    let checkButtonLabel;
-    let checkButtonDisabled = false;
-
-    if (currentProject.checkedOutBy) {
-        if (currentProject.checkedOutBy.email === userEmail) {
-            checkButtonLabel = "Check In";
-        } else {
-            checkButtonLabel = `Checked Out by ${currentProject.checkedOutBy.name}`;
-            checkButtonDisabled = true;
-        }
+  if (currentProject.checkedOutBy) {
+    if (currentProject.checkedOutBy.email === userEmail) {
+      checkButtonLabel = "Check In";
     } else {
-        checkButtonLabel = "Check Out";
+      checkButtonLabel = `Checked Out by ${currentProject.checkedOutBy.name}`;
+      checkButtonDisabled = true;
     }
+  } else {
+    checkButtonLabel = "Check Out";
+  }
 
-    const handleCheckClick = async () => {
-        if (!isOwnerOrMember) return;
-        if (!currentProject.checkedOutBy) {
-            try {
-                const res = await fetch(`/api/projects/${currentProject._id}/checkout`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ email: userEmail }),
-                });
-                const data = await res.json();
-                if (!res.ok) throw new Error(data.error || "Failed to check out");
-                setCurrentProject(data.project);
-            } catch (err) {
-                console.error(err);
-                alert(err.message);
-            }
-        } else if (currentProject.checkedOutBy.email === userEmail) {
-            setActiveView("checkin");
-        }
-    };
+  const handleCheckClick = async () => {
+    if (!isOwnerOrMember) return;
+    if (!currentProject.checkedOutBy) {
+      try {
+        const res = await fetch(`/api/projects/${currentProject._id}/checkout`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: userEmail }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Failed to check out");
+        setCurrentProject(data.project);
+      } catch (err) {
+        alert(err.message);
+      }
+    } else if (currentProject.checkedOutBy.email === userEmail) {
+      setActiveView("checkin");
+    }
+  };
 
-    const handleDownload = () => {
-        window.open(`/api/projects/download-multiple/${currentProject._id}`, "_blank");
-    };
+  const handleDownload = () => {
+    window.open(`/api/projects/download-multiple/${currentProject._id}`, "_blank");
+  };
 
-    const handleCommentSubmit = async (e) => {
-        e.preventDefault();
-        if (!commentInput.trim()) {
-            setCommentError("Comment cannot be empty");
-            return;
-        }
-        try {
-            const res = await fetch(`/api/projects/${currentProject._id}/comments`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email: userEmail, comment: commentInput }),
-            });
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.error || "Failed to add comment");
-            setCommentInput("");
-            setCommentError("");
-        } catch (err) {
-            console.error(err);
-            setCommentError(err.message);
-        }
-    };
+  const handleCommentSubmit = async (e) => {
+    e.preventDefault();
+    if (!commentInput.trim()) {
+      setCommentError("Comment cannot be empty");
+      return;
+    }
+    try {
+      const res = await fetch(`/api/projects/${currentProject._id}/comments`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: userEmail, comment: commentInput }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to add comment");
+      setCommentInput("");
+      setCommentError("");
+    } catch (err) {
+      setCommentError(err.message);
+    }
+  };
 
-    return (
-        <>
-            <div className="bar">
-                <h2>{currentProject.name}</h2>
-                <div className="barButtons">
-                    <button
-                        className="checkIn accent"
-                        onClick={handleCheckClick}
-                        disabled={checkButtonDisabled || !isOwnerOrMember}
-                        style={{
-                            opacity: checkButtonDisabled || !isOwnerOrMember ? 0.5 : 1,
-                            cursor: checkButtonDisabled || !isOwnerOrMember ? "not-allowed" : "pointer",
-                        }}
-                    >
-                        {checkButtonLabel}
-                    </button>
-                    <button onClick={handleDownload}>Dow</button>
-                    <button onClick={() => toggleRight("chat")}>Chat</button>
-                    {isOwner && (
-                        <button className="editButton" onClick={() => toggleRight("edit")}>
-                            Edit
-                        </button>
-                    )}
-                </div>
+  const handleFileClick = async (fileObj) => {
+    setSelectedFile(fileObj);
+    setLoadingFile(true);
+    setFileContent("");
+
+    try {
+      const fileId = fileObj.path.split("/").pop();
+      const res = await fetch(`/api/files/content/${fileId}`, {
+        credentials: "include"
+      });
+
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(text.includes("<!DOCTYPE") ? "Not logged in" : text);
+      }
+
+      const data = await res.json();
+      setFileContent(data.content);
+    } catch (err) {
+      setFileContent(`Error: ${err.message}`);
+    } finally {
+      setLoadingFile(false);
+    }
+  };
+
+  return (
+    <>
+      <div className="bar">
+        <h2>{currentProject.name}</h2>
+        <div className="barButtons">
+          <button
+            className="checkIn accent"
+            onClick={handleCheckClick}
+            disabled={checkButtonDisabled || !isOwnerOrMember}
+            style={{
+              opacity: checkButtonDisabled || !isOwnerOrMember ? 0.5 : 1,
+              cursor: checkButtonDisabled || !isOwnerOrMember ? "not-allowed" : "pointer",
+            }}
+          >
+            {checkButtonLabel}
+          </button>
+          <button onClick={handleDownload}>Download All</button>
+          <button onClick={() => setActiveView("chat")}>Chat</button>
+          {isOwner && (
+            <button className="editButton" onClick={() => setActiveView("edit")}>
+              Edit
+            </button>
+          )}
+        </div>
+      </div>
+
+      <div className="leftSect">
+        <h3 className="heading3">Files</h3>
+        <div className="fileButtons">
+          {currentProject.files?.map((file, idx) => (
+            <button
+              key={idx}
+              className={selectedFile?.name === file.name ? "active" : ""}
+              onClick={() => handleFileClick(file)}
+            >
+              {file.name}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="rightSect">
+        {activeView === "checkin" && (
+          <CheckInProject
+            projectId={currentProject._id}
+            userEmail={userEmail}
+            onCheckIn={(updatedProject) => {
+              setCurrentProject(updatedProject);
+              setActiveView("file");
+            }}
+            onClose={() => setActiveView("file")}
+          />
+        )}
+        {activeView === "edit" && (
+          <EditProject
+            projectId={currentProject._id}
+            onClose={() => setActiveView("file")}
+          />
+        )}
+        {activeView === "chat" && (
+          <div className="chatPanel">
+            <h3 className="heading3">Project Chat</h3>
+            <form onSubmit={handleCommentSubmit}>
+              <div className="commentInput">
+                <textarea
+                  placeholder="Add a comment..."
+                  value={commentInput}
+                  onChange={(e) => setCommentInput(e.target.value)}
+                />
+                <button type="submit" disabled={!isOwnerOrMember}>
+                  Send
+                </button>
+              </div>
+              {commentError && <p style={{ color: "red" }}>{commentError}</p>}
+            </form>
+            <div className="commentList">
+              {project.activities
+                ?.filter((a) => a.actionType === "comment")
+                .map((activity) => (
+                  <div key={activity.id} className="comment">
+                    <p>
+                      <strong>{activity.user}</strong> ({activity.email}) at{" "}
+                      {new Date(activity.timestamp).toLocaleString()}
+                    </p>
+                    <p>{activity.description.split(": ")[1] || activity.description}</p>
+                  </div>
+                ))}
             </div>
-
-            <div className="leftSect">
-                <h3 className="heading3">Files</h3>
-                <div className="fileButtons">
-                    {currentProject.files.map((file, idx) => (
-                        <button key={idx}>{file}</button>
-                    ))}
-                </div>
-            </div>
-
-            <div className="rightSect">
-                {activeView === "checkin" && (
-                    <CheckInProject
-                        projectId={currentProject._id}
-                        userEmail={userEmail}
-                        onCheckIn={(updatedProject) => {
-                            setCurrentProject(updatedProject);
-                            setActiveView("file");
-                        }}
-                        onClose={() => setActiveView("file")}
-                    />
+            <button onClick={() => setActiveView("file")}>Close</button>
+          </div>
+        )}
+        {activeView === "file" && (
+          <div className="fileDisplay">
+            {selectedFile ? (
+              <>
+                <h4>{selectedFile.name}</h4>
+                {loadingFile ? (
+                  <p>Loading...</p>
+                ) : (
+                  <pre className="codeBlock">{fileContent}</pre>
                 )}
-                {activeView === "edit" && (
-                    <EditProject
-                        projectId={currentProject._id}
-                        onClose={() => setActiveView("file")}
-                    />
-                )}
-                {activeView === "chat" && (
-                    <div className="chatPanel">
-                        <h3 className="heading3">Project Chat</h3>
-                        <form onSubmit={handleCommentSubmit}>
-                            <div className="commentInput">
-                                <textarea
-                                    placeholder="Add a comment..."
-                                    value={commentInput}
-                                    onChange={(e) => setCommentInput(e.target.value)}
-                                />
-                                <button type="submit" disabled={!isOwnerOrMember}>
-                                    Send
-                                </button>
-                            </div>
-                            {commentError && <p style={{ color: "red" }}>{commentError}</p>}
-                        </form>
-                        <div className="commentList">
-                            {project.activities
-                                ?.filter((a) => a.actionType === "comment")
-                                .map((activity) => (
-                                    <div key={activity.id} className="comment">
-                                        <p>
-                                            <strong>{activity.user}</strong> ({activity.email}) at {new Date(activity.timestamp).toLocaleString()}
-                                        </p>
-                                        <p>{activity.description.split(": ")[1] || activity.description}</p>
-                                    </div>
-                                ))}
-                        </div>
-                        <button onClick={() => setActiveView("file")}>Close</button>
-                    </div>
-                )}
-                {activeView === "file" && (
-                    <div className="fileDisplay">
-                        {currentProject.files.map((file, idx) => (
-                            <code key={idx} className="fileLine">{`${idx + 1} ${file}`}</code>
-                        ))}
-                        <p>
-                            Status:{" "}
-                            {currentProject.checkedOutBy
-                                ? `Checked out by ${currentProject.checkedOutBy.name}`
-                                : "Available"}
-                        </p>
-                    </div>
-                )}
-            </div>
-        </>
-    );
+              </>
+            ) : (
+              <p>Select a file on the left to view its contents.</p>
+            )}
+            <p>
+              Status:{" "}
+              {currentProject.checkedOutBy
+                ? `Checked out by ${currentProject.checkedOutBy.name}`
+                : "Available"}
+            </p>
+          </div>
+        )}
+      </div>
+    </>
+  );
 };
-
 
 export const ViewVersionHistory = ({ versionHistory }) => {
     const hasHistory = versionHistory && versionHistory.length > 0;

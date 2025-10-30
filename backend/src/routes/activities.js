@@ -4,7 +4,7 @@ export default function activityRoutes(db) {
   const router = express.Router();
   const activitiesCollection = db.collection("activities");
 
-  // GET all activities
+  // get all activities
   router.get("/", async (req, res) => {
     try {
       const { scope, email, project, search, sort } = req.query;
@@ -22,13 +22,14 @@ export default function activityRoutes(db) {
         ];
       }
 
-      // Fetch activities
+      // fetch activities
       let activities = await activitiesCollection.find(query).toArray();
 
-      // Fetch corresponding projects
+      // fetch corresponding projects
       const projectNames = [...new Set(activities.map(a => a.projectName).filter(Boolean))];
       const projects = await db.collection("projects")
         .find({ name: { $in: projectNames } })
+        .project({ name: 1, description: 1, image: 1 })
         .toArray();
 
       const projectMap = {};
@@ -36,19 +37,23 @@ export default function activityRoutes(db) {
         projectMap[p.name] = p;
       });
 
-      // Add project description to activities
+      // add project description and image to activities
       activities = activities.map(a => ({
         ...a,
         id: a._id.toString(),
-        projectDescription: projectMap[a.projectName]?.description || a.description
+        projectDescription: projectMap[a.projectName]?.description || a.description,
+        projectImage: projectMap[a.projectName]?.image || "/assets/img/placeholder.png"
       }));
 
-      // Sorting
+      // sorting
       if (sort) {
         if (sort === "date-desc") activities.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
         if (sort === "date-asc") activities.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
         if (sort === "name-asc") activities.sort((a, b) => (a.projectName || '').localeCompare(b.projectName || ''));
         if (sort === "name-desc") activities.sort((a, b) => (b.projectName || '').localeCompare(a.projectName || ''));
+      } else {
+        // else newest first
+        activities.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
       }
 
       res.json(activities);

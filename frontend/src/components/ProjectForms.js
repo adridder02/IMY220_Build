@@ -32,16 +32,12 @@ export const CreateProject = ({ onClose, onProjectCreated }) => {
 
     const handleAddFile = (file) => {
         if (!file) return;
-        setFormData(prev => ({ ...prev, files: [...prev.files, file.name || file] }));
-        setFileObjects(prev => [...prev, file]);
+        setFormData(prev => ({ ...prev, files: [...prev.files, file] }));
+        if (file instanceof File) {
+            setFileObjects(prev => [...prev, file]);
+        }
     };
 
-    const handleAddMember = (email) => {
-        if (!email) return;
-        setFormData(prev => ({ ...prev, members: [...prev.members, email] }));
-    };
-
-    // file upload functions
     const uploadImage = async (file) => {
         if (!file) return '';
         const form = new FormData();
@@ -49,7 +45,7 @@ export const CreateProject = ({ onClose, onProjectCreated }) => {
         const res = await fetch('/api/projects/upload-image', { method: 'POST', body: form });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'Image upload failed');
-        return data.filename;
+        return data.path;
     };
 
     const uploadFiles = async (files) => {
@@ -59,7 +55,18 @@ export const CreateProject = ({ onClose, onProjectCreated }) => {
         const res = await fetch('/api/projects/upload-files', { method: 'POST', body: form });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'Files upload failed');
-        return data.files.map(f => f.filename);
+        return data.files;
+    };
+
+    const createBlankFile = async (name) => {
+        const res = await fetch('/api/projects/create-blank-file', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Blank file creation failed');
+        return data;
     };
 
     const handleSubmit = async (e) => {
@@ -72,12 +79,26 @@ export const CreateProject = ({ onClose, onProjectCreated }) => {
         }
 
         try {
-            const imageFilename = await uploadImage(imageFile);
-            const uploadedFiles = await uploadFiles(fileObjects);
+            const imagePath = await uploadImage(imageFile);
+
+            // separate real files and blank names
+            const realFiles = formData.files.filter(f => f instanceof File);
+            const blankNames = formData.files.filter(f => typeof f === 'string');
+
+            const uploadedFiles = await uploadFiles(realFiles);
+
+            const blankFiles = [];
+            for (const name of blankNames) {
+                const fileInfo = await createBlankFile(name);
+                blankFiles.push(fileInfo);
+            }
+
+            const allFiles = [...uploadedFiles, ...blankFiles];
+
             const projectData = {
                 ...formData,
-                image: imageFilename,
-                files: uploadedFiles
+                image: imagePath,
+                files: allFiles   // array of { name, path }
             };
 
             const res = await fetch('/api/projects', {
@@ -108,18 +129,40 @@ export const CreateProject = ({ onClose, onProjectCreated }) => {
 
                 <div className="uploadArea">
                     <label>Project Image</label>
+                    <div
+                        className="imageUploader"
+                        onClick={() => document.getElementById('projectImageInput').click()}
+                        onDragOver={e => { e.preventDefault(); e.currentTarget.classList.add('drag'); }}
+                        onDragLeave={e => { e.preventDefault(); e.currentTarget.classList.remove('drag'); }}
+                        onDrop={e => {
+                            e.preventDefault();
+                            e.currentTarget.classList.remove('drag');
+                            const file = e.dataTransfer.files[0];
+                            if (file?.type.startsWith('image/')) {
+                                setImageFile(file);
+                                handleInputChange('image', URL.createObjectURL(file));
+                            }
+                        }}
+                    >
+                        {formData.image ? (
+                            <img src={formData.image} alt="preview" className="previewImg" />
+                        ) : (
+                            <p>Click or drag image here</p>
+                        )}
+                    </div>
                     <input
+                        id="projectImageInput"
                         type="file"
                         accept="image/*"
+                        style={{ display: 'none' }}
                         onChange={(e) => {
                             const file = e.target.files[0];
                             if (file) {
                                 setImageFile(file);
-                                handleInputChange('image', file.name);
+                                handleInputChange('image', URL.createObjectURL(file));
                             }
                         }}
                     />
-                    {formData.image && <p>{formData.image}</p>}
                 </div>
 
                 <form onSubmit={handleSubmit}>
@@ -153,6 +196,7 @@ export const CheckInProject = ({ projectId, userEmail, onCheckIn, onClose }) => 
         version: '',
         files: [],
     });
+    const [fileObjects, setFileObjects] = useState([]);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(true);
 
@@ -182,26 +226,59 @@ export const CheckInProject = ({ projectId, userEmail, onCheckIn, onClose }) => 
 
     const handleAddFile = (file) => {
         if (!file) return;
-        setFormData((prev) => ({ ...prev, files: [...prev.files, file.name || file] }));
+        setFormData((prev) => ({ ...prev, files: [...prev.files, file] }));
+        if (file instanceof File) {
+            setFileObjects(prev => [...prev, file]);
+        }
+    };
+
+    const uploadFiles = async (files) => {
+        if (!files || files.length === 0) return [];
+        const form = new FormData();
+        files.forEach(f => form.append('files', f));
+        const res = await fetch('/api/projects/upload-files', { method: 'POST', body: form });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Files upload failed');
+        return data.files;
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
         try {
+            // upload any new file objects first
+            const uploadedFiles = await uploadFiles(fileObjects);
+
+            // combine previously added files and newly uploaded files
+            const existingFiles = formData.files.filter(f => typeof f === 'string' || f.path);
+            const allFiles = [...existingFiles, ...uploadedFiles];
+
+            if (!formData.description) {
+                setError('Description is required');
+                return;
+            }
+
             const response = await fetch(`/api/projects/${projectId}/checkin`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ ...formData, userEmail }),
+                body: JSON.stringify({
+                    userEmail,
+                    description: formData.description,
+                    version: formData.version || undefined,
+                    files: allFiles
+                }),
             });
+
             const data = await response.json();
             if (!response.ok) throw new Error(data.error || 'Failed to check in project');
+
             onCheckIn(data.project);
             onClose();
         } catch (err) {
             setError(err.message);
         }
     };
+
 
     if (loading) return <div>Loading...</div>;
     if (error) return <div>Error: {error}</div>;
@@ -214,13 +291,6 @@ export const CheckInProject = ({ projectId, userEmail, onCheckIn, onClose }) => 
                     <div className="close" onClick={onClose}>X</div>
                 </div>
                 <div className="timestamp">{new Date().toLocaleString()}</div>
-                <div className="uploadArea">
-                    <input
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => handleInputChange('image', e.target.files[0]?.name || '')}
-                    />
-                </div>
                 {error && <p style={{ color: 'red' }}>{error}</p>}
                 <form onSubmit={handleSubmit}>
                     <div className="formContent">
@@ -259,9 +329,10 @@ export const EditProject = ({ projectId, onClose, onProjectUpdate }) => {
         version: '0.0.0',
         members: [],
     });
+    const [imageFile, setImageFile] = useState(null);
+    const [fileObjects, setFileObjects] = useState([]);
     const [error, setError] = useState('');
 
-    // Fetch project
     useEffect(() => {
         const fetchProject = async () => {
             try {
@@ -269,13 +340,15 @@ export const EditProject = ({ projectId, onClose, onProjectUpdate }) => {
                 if (!response.ok) throw new Error('Failed to fetch project');
                 const data = await response.json();
 
+                const files = data.files.map(f => typeof f === 'string' ? { name: f.split('/').pop(), path: f } : f);
+
                 setFormData({
                     name: data.name,
                     type: data.type,
                     description: data.description,
                     tags: data.tags || [],
                     image: data.image || '',
-                    files: data.files || [],
+                    files: files,
                     version: data.version,
                     members: data.members.map(m => ({
                         id: m._id?.toString(),
@@ -305,16 +378,18 @@ export const EditProject = ({ projectId, onClose, onProjectUpdate }) => {
     };
 
     const handleAddFile = (file) => {
+        if (!file) return;
         setFormData(prev => ({ ...prev, files: [...prev.files, file] }));
+        if (file instanceof File) {
+            setFileObjects(prev => [...prev, file]);
+        }
     };
 
     const handlePromote = (email) => {
         setFormData((prev) => {
             const members = [...prev.members];
             const idx = members.findIndex((m) => m.email === email);
-            if (idx === -1 || idx === 0) return prev; // already owner
-
-            // Swap with owner (index 0)
+            if (idx === -1 || idx === 0) return prev;
             [members[0], members[idx]] = [members[idx], members[0]];
             return { ...prev, members };
         });
@@ -328,13 +403,61 @@ export const EditProject = ({ projectId, onClose, onProjectUpdate }) => {
         }));
     };
 
+    const uploadImage = async (file) => {
+        if (!file) return formData.image;
+        const form = new FormData();
+        form.append('image', file);
+        const res = await fetch('/api/projects/upload-image', { method: 'POST', body: form });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Image upload failed');
+        return data.path;
+    };
+
+    const uploadFiles = async (files) => {
+        if (!files || files.length === 0) return [];
+        const form = new FormData();
+        files.forEach(f => form.append('files', f));
+        const res = await fetch('/api/projects/upload-files', { method: 'POST', body: form });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Files upload failed');
+        return data.files;
+    };
+
+    const createBlankFile = async (name) => {
+        const res = await fetch('/api/projects/create-blank-file', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Blank file creation failed');
+        return data;
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
 
         try {
+            const imagePath = await uploadImage(imageFile);
+
+            const realFiles = fileObjects.filter(f => f instanceof File);
+            const blankNames = formData.files.filter(f => typeof f === 'string');
+
+            const uploadedFiles = await uploadFiles(realFiles);
+
+            const blankFiles = [];
+            for (const name of blankNames) {
+                const fileInfo = await createBlankFile(name);
+                blankFiles.push(fileInfo);
+            }
+
+            const allFiles = [...formData.files.filter(f => typeof f !== 'string' && !(f instanceof File)), ...uploadedFiles, ...blankFiles];
+
             const payload = {
                 ...formData,
+                image: imagePath,
+                files: allFiles,   // array of { name, path }
                 members: formData.members.map(m => m.email),
             };
 
@@ -347,7 +470,7 @@ export const EditProject = ({ projectId, onClose, onProjectUpdate }) => {
             const data = await res.json();
             if (!res.ok) throw new Error(data.error || 'Failed to update');
 
-            onProjectUpdate?.(data.project);  // Refresh parent
+            onProjectUpdate?.(data.project);
             onClose();
         } catch (err) {
             setError(err.message);
@@ -364,10 +487,40 @@ export const EditProject = ({ projectId, onClose, onProjectUpdate }) => {
                 <div className="timestamp">{new Date().toLocaleString()}</div>
 
                 <div className="uploadArea">
+                    <label>Project Image</label>
+                    <div
+                        className="imageUploader"
+                        onClick={() => document.getElementById('editProjectImageInput').click()}
+                        onDragOver={e => { e.preventDefault(); e.currentTarget.classList.add('drag'); }}
+                        onDragLeave={e => { e.preventDefault(); e.currentTarget.classList.remove('drag'); }}
+                        onDrop={e => {
+                            e.preventDefault();
+                            e.currentTarget.classList.remove('drag');
+                            const file = e.dataTransfer.files[0];
+                            if (file?.type.startsWith('image/')) {
+                                setImageFile(file);
+                                handleInputChange('image', URL.createObjectURL(file));
+                            }
+                        }}
+                    >
+                        {formData.image ? (
+                            <img src={formData.image} alt="preview" className="previewImg" />
+                        ) : (
+                            <p>Click or drag image here</p>
+                        )}
+                    </div>
                     <input
+                        id="editProjectImageInput"
                         type="file"
                         accept="image/*"
-                        onChange={(e) => handleInputChange('image', e.target.files[0]?.name || '')}
+                        style={{ display: 'none' }}
+                        onChange={(e) => {
+                            const file = e.target.files[0];
+                            if (file) {
+                                setImageFile(file);
+                                handleInputChange('image', URL.createObjectURL(file));
+                            }
+                        }}
                     />
                 </div>
 

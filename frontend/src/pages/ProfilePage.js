@@ -8,6 +8,7 @@ import {
     ProfileSection,
     ProjectSection,
     WordCloud,
+    AvatarUpload
 } from '../components/ProfileComponents';
 import './css/profile.css';
 
@@ -25,8 +26,9 @@ const ProfilePage = () => {
     const [friends, setFriends] = useState([]);
 
     const isOwner = user?.id === id;
+    const [avatarUrl, setAvatarUrl] = useState("/assets/img/placeholder.png");
 
-    // Fetch user profile
+    // fetch user profile
     useEffect(() => {
         const fetchProfile = async () => {
             if (!id) return;
@@ -35,8 +37,9 @@ const ProfilePage = () => {
                 if (!response.ok) throw new Error('Failed to fetch user');
                 const data = await response.json();
 
-                // Use userInfo array from backend
+                // userInfo array from backend
                 setUserInfo(data.userInfo || []);
+                setAvatarUrl(data.avatar || "/assets/img/placeholder.png");
             } catch (err) {
                 console.error(err);
                 setError(err.message);
@@ -47,7 +50,7 @@ const ProfilePage = () => {
         fetchProfile();
     }, [id]);
 
-    // Fetch activities, projects, friends once email is available
+    // fetch activities, projectsa and friends 
     useEffect(() => {
         const emailField = userInfo.find(f => f.field === 'email');
         if (!emailField?.value) return;
@@ -87,7 +90,7 @@ const ProfilePage = () => {
                     lastName: f.lastName,
                     email: f.email,
                     avatar: f.avatar || "/assets/img/placeholder.png",
-                    online: f.status ?? false 
+                    online: f.status ?? false
                 }));
                 setFriends(normalized);
             } catch (err) {
@@ -156,6 +159,7 @@ const ProfilePage = () => {
     const firstName = userInfo.find(f => f.field === 'name')?.value || '';
     const lastName = userInfo.find(f => f.field === 'surname')?.value || '';
 
+
     return (
         <div className="profile-container">
             <div className="mainCol">
@@ -168,7 +172,15 @@ const ProfilePage = () => {
                     </button>
                 )}
 
-                <img src="/assets/img/placeholder.png" alt="pfp" className="pfp" />
+                {isOwner ? (
+                    <AvatarUpload
+                        currentAvatar={avatarUrl}
+                        userId={user.id}
+                        onAvatarChange={setAvatarUrl}
+                    />
+                ) : (
+                    <img src={avatarUrl} alt="pfp" className="pfp" />
+                )}
                 <h2>{firstName} {lastName}</h2>
                 <div className="hLine"></div>
 

@@ -5,7 +5,7 @@ export default function userRoutes(db) {
   const router = express.Router();
   const usersCollection = db.collection("users");
 
-  // GET user by email
+  // get user by email
   router.get("/user", async (req, res) => {
     const { email } = req.query;
     if (!email) return res.status(400).json({ error: "Email required" });
@@ -16,7 +16,7 @@ export default function userRoutes(db) {
     res.json({ ...user, id: user._id.toString() });
   });
 
-  // GET user by _id
+  // get user by _id
   router.get("/:id", async (req, res) => {
     let userId;
     try {
@@ -31,7 +31,7 @@ export default function userRoutes(db) {
     res.json({ ...user, id: user._id.toString() });
   });
 
-  // GET friends
+  // get friends
   router.get("/:id/friends", async (req, res) => {
     let userId;
     try {
@@ -43,35 +43,32 @@ export default function userRoutes(db) {
     const user = await usersCollection.findOne({ _id: userId });
     if (!user) return res.status(404).json({ error: "User not found" });
 
-    // user.friends now stores ObjectIds
     const friendIds = (user.friends || [])
-      .filter(f => f)            // remove null/undefined
+      .filter(f => f)            
       .map(f => {
-        try { return new ObjectId(f._id || f); } catch { return null; } // handle both {_id} or direct ObjectId
+        try { return new ObjectId(f._id || f); } catch { return null; } 
       })
-      .filter(f => f !== null);  // remove invalid entries
+      .filter(f => f !== null);  
 
-    if (friendIds.length === 0) return res.json([]); // no friends
+    if (friendIds.length === 0) return res.json([]);
 
     const friendsList = await usersCollection
       .find({ _id: { $in: friendIds } })
       .toArray();
 
-    // Normalize response
     const normalized = friendsList.map(f => ({
       id: f._id.toString(),
       firstName: f.firstName,
       lastName: f.lastName,
       email: f.email,
       avatar: f.avatar || "/assets/img/placeholder.png",
-      online: f.status ?? false 
+      online: f.status ?? false
     }));
 
     res.json(normalized);
   });
 
-
-  // Remove friend
+  // remove friend
   router.delete("/:id/friends/:friendId", async (req, res) => {
     let userId, friendId;
     try {
@@ -99,7 +96,7 @@ export default function userRoutes(db) {
     res.json({ message: "Friend removed", friends: updatedUser.friends || [] });
   });
 
-  // Update user profile with userInfo
+  // update user profile with userInfo
   router.patch("/:id", async (req, res) => {
     let userId;
     try {
@@ -108,7 +105,7 @@ export default function userRoutes(db) {
       return res.status(400).json({ error: "Invalid user ID" });
     }
 
-    const { userInfo } = req.body;
+    const { userInfo, avatar } = req.body;
     if (!Array.isArray(userInfo)) return res.status(400).json({ error: "userInfo array required" });
 
     const mainFields = {};
@@ -118,10 +115,13 @@ export default function userRoutes(db) {
       else mainFields[field] = value || "";
     });
 
+    const updateObj = { ...mainFields, userInfo };
+    if (avatar) updateObj.avatar = avatar;
+
     try {
       const result = await usersCollection.updateOne(
         { _id: userId },
-        { $set: { ...mainFields, userInfo } }
+        { $set: updateObj }
       );
 
       if (result.matchedCount === 0) return res.status(404).json({ error: "User not found" });
@@ -134,7 +134,7 @@ export default function userRoutes(db) {
     }
   });
 
-  // Delete user
+  // delete user
   router.delete("/:id", async (req, res) => {
     let userId;
     try { userId = new ObjectId(req.params.id); }
@@ -147,7 +147,7 @@ export default function userRoutes(db) {
     res.json({ message: "Profile deleted successfully" });
   });
 
-  // Search users
+  // search users
   router.get("/", async (req, res) => {
     const { search } = req.query;
     if (!search) return res.json([]);
@@ -158,7 +158,7 @@ export default function userRoutes(db) {
     res.json(matched.map(u => ({ ...u, id: u._id.toString() })));
   });
 
-  // Friend requests
+  // friend requests
   router.post("/:id/friend-request", async (req, res) => {
     const { senderEmail } = req.body;
     if (!senderEmail) return res.status(400).json({ error: "senderEmail required" });
@@ -188,7 +188,7 @@ export default function userRoutes(db) {
     res.json({ message: "Friend request sent" });
   });
 
-  // Accept friend request
+  // accept friend request
   router.post("/:id/friend-request/:senderId/accept", async (req, res) => {
     let userId, senderId;
     try {
@@ -209,7 +209,7 @@ export default function userRoutes(db) {
     res.json({ message: "Friend request accepted", friends: updatedUser.friends || [] });
   });
 
-  // Reject friend request
+  // reject friend request
   router.post("/:id/friend-request/:senderId/reject", async (req, res) => {
     let userId, senderId;
     try {

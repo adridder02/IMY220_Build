@@ -3,6 +3,16 @@
     Author     : ane
 */
 
+.avatarUploader {
+    cursor: pointer;
+    margin: 0 auto;
+}
+
+.avatarUploader.drag {
+    outline: 3px dashed var(--tertiary);
+    outline-offset: -3px;
+}
+
 .profile-container {
     display: grid;
     grid-template-areas:

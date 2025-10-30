@@ -1,9 +1,57 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
-export const ActivityType1 = ({ user, action, projectName, timestamp }) => {
+const avatarCache = new Map();
+
+const fetchAvatar = async (userId) => {
+  if (!userId) return "/assets/img/placeholder.png";
+
+  // check cache first
+  if (avatarCache.has(userId)) return avatarCache.get(userId);
+
+  // check local
+  const cached = localStorage.getItem(`avatar_${userId}`);
+  if (cached) {
+    const { url, timestamp } = JSON.parse(cached);
+    // expire after 7 days
+    if (Date.now() - timestamp < 7 * 24 * 60 * 60 * 1000) {
+      avatarCache.set(userId, url);
+      return url;
+    }
+  }
+
+  // fetch from server
+  let url;
+  try {
+    if (userId.includes('@')) {
+      const res = await fetch(`/api/users/user?email=${encodeURIComponent(userId)}`);
+      const data = await res.json();
+      url = data.avatar || "/assets/img/placeholder.png";
+    } else {
+      const res = await fetch(`/api/users/${userId}`);
+      const data = await res.json();
+      url = data.avatar || "/assets/img/placeholder.png";
+    }
+
+    // cache in memory + localStorage
+    avatarCache.set(userId, url);
+    localStorage.setItem(`avatar_${userId}`, JSON.stringify({
+      url,
+      timestamp: Date.now()
+    }));
+
+    return url;
+  } catch (err) {
+    console.error("Avatar fetch failed:", err);
+    const fallback = "/assets/img/placeholder.png";
+    avatarCache.set(userId, fallback);
+    return fallback;
+  }
+};
+
+export const ActivityType1 = ({ avatarUrl, user, action, projectName, timestamp }) => {
   return (
     <div className="ActivityType1">
-      <img src="/assets/img/placeholder.png" alt="userPfp" className="avatar" />
+      <img src={avatarUrl} alt="userPfp" className="avatar" />
       <div className="text">
         <div className="title">
           <p>{user || 'Unknown User'}</p>
@@ -16,17 +64,37 @@ export const ActivityType1 = ({ user, action, projectName, timestamp }) => {
   );
 };
 
+const ActivityType1WithAvatar = ({ userId, ...props }) => {
+  const [avatarUrl, setAvatarUrl] = useState("/assets/img/placeholder.png");
+  useEffect(() => {
+    let mounted = true;
+    fetchAvatar(userId).then(url => { if (mounted) setAvatarUrl(url); });
+    return () => { mounted = false; };
+  }, [userId]);
+  return <ActivityType1 avatarUrl={avatarUrl} {...props} />;
+};
+
 const truncateText = (text, maxLength = 100) => {
   if (!text) return '';
   return text.length > maxLength ? text.slice(0, maxLength) + '…' : text;
 };
 
-export const ActivityType2 = ({ user, action, projectName, timestamp, description, cardTitle, cardDescription }) => {
-  
+export const ActivityType2 = ({
+  userId,
+  user,
+  action,
+  projectName,
+  timestamp,
+  description,
+  cardTitle,
+  cardDescription,
+  projectImage
+}) => {
   return (
     <div className="ActivityType2">
       <div className="left">
-        <ActivityType1
+        <ActivityType1WithAvatar
+          userId={userId}
           user={user}
           action={action}
           projectName={projectName}
@@ -40,7 +108,10 @@ export const ActivityType2 = ({ user, action, projectName, timestamp, descriptio
       <div className="vLine"></div>
       <div className="right">
         <div className="cardMini">
-          <img src="/assets/img/placeholder.png" alt="projectImg" />
+          <img
+            src={projectImage || "/assets/img/placeholder.png"}
+            alt={cardTitle || "project"}
+          />
           <div className="hLine"></div>
           <h3>{cardTitle || 'No Title'}</h3>
           <p>{truncateText(cardDescription, 50) || 'No description'}</p>
@@ -50,11 +121,19 @@ export const ActivityType2 = ({ user, action, projectName, timestamp, descriptio
   );
 };
 
-export const ActivityType3 = ({ user, action, projectName, timestamp, description }) => {
+export const ActivityType3 = ({
+  userId,
+  user,
+  action,
+  projectName,
+  timestamp,
+  description
+}) => {
   return (
     <div className="ActivityType3">
       <div className="left">
-        <ActivityType1
+        <ActivityType1WithAvatar
+          userId={userId}
           user={user}
           action={action}
           projectName={projectName}
@@ -74,26 +153,31 @@ const Activities = ({ activities, forProject = false }) => {
     <div className="activities">
       {activities.map((activity) => {
         const props = {
+          userId: activity.userId,
           user: activity.user,
           action: activity.action,
           projectName: activity.projectName,
-          timestamp: activity.timestamp ? new Date(activity.timestamp).toLocaleString() : 'No Date',
+          timestamp: activity.timestamp
+            ? new Date(activity.timestamp).toLocaleString()
+            : 'No Date',
           description: activity.description,
           cardTitle: activity.projectName,
           cardDescription: activity.projectDescription,
+          projectImage: activity.projectImage || "/assets/img/placeholder.png"
         };
 
         if (activity.actionType === "checkout") {
-          return <ActivityType1 key={activity.id} {...props} />;
+          return <ActivityType1WithAvatar key={activity.id} userId={activity.userId} {...props} />;
         } else {
-          return forProject
-            ? <ActivityType3 key={activity.id} {...props} />  // Project page
-            : <ActivityType2 key={activity.id} {...props} />; // Home page
+          return forProject ? (
+            <ActivityType3 key={activity.id} {...props} />
+          ) : (
+            <ActivityType2 key={activity.id} {...props} />
+          );
         }
       })}
     </div>
   );
 };
-
 
 export default Activities;
