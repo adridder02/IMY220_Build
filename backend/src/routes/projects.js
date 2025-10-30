@@ -7,7 +7,7 @@ export default function projectRoutes(db) {
   const usersCollection = db.collection("users");
   const activitiesCollection = db.collection("activities");
 
-  // Helper function to create activity
+  // helper to create activity
   const createActivity = async (actionType, userName, email, projectName, description) => {
     let verb;
     switch (actionType) {
@@ -33,7 +33,7 @@ export default function projectRoutes(db) {
     });
   };
 
-  // GET all projects
+  // get all projects
   router.get("/", async (req, res) => {
     try {
       const { email, scope = "all", search } = req.query;
@@ -50,7 +50,7 @@ export default function projectRoutes(db) {
     }
   });
 
-  // GET single project by MongoDB ObjectId
+  // get single project by MongoDB ObjectId
   router.get("/:id", async (req, res) => {
     try {
       const id = req.params.id;
@@ -66,7 +66,7 @@ export default function projectRoutes(db) {
     }
   });
 
-  // POST create project
+  // create project
   router.post("/", async (req, res) => {
     try {
       const { name, type, description, tags, image, files, version, members } = req.body;
@@ -114,7 +114,7 @@ export default function projectRoutes(db) {
     }
   });
 
-  // POST checkout project
+  // checkout project
   router.post("/:id/checkout", async (req, res) => {
     try {
       const id = req.params.id;
@@ -148,7 +148,7 @@ export default function projectRoutes(db) {
     }
   });
 
-  // POST check-in project
+  // check-in project
   router.post("/:id/checkin", async (req, res) => {
     try {
       const id = req.params.id;
@@ -265,7 +265,7 @@ export default function projectRoutes(db) {
     }
   });
 
-  // PUT update project
+  // update project
   router.put("/:id", async (req, res) => {
     try {
       const id = req.params.id;
@@ -362,7 +362,7 @@ export default function projectRoutes(db) {
     }
   });
 
-  // DELETE project
+  // delete project
   router.delete("/:id", async (req, res) => {
     try {
       const id = req.params.id;
@@ -391,7 +391,7 @@ export default function projectRoutes(db) {
     }
   });
 
-  // POST comment on project
+  // comment on project
   router.post("/:id/comments", async (req, res) => {
     try {
       const id = req.params.id;

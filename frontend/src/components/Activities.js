@@ -31,8 +31,6 @@ const fetchAvatar = async (userId) => {
   }
 };
 
-
-
 export const ActivityType1 = ({ avatarUrl, user, action, projectName, timestamp }) => {
   return (
     <div className="ActivityType1">

@@ -22,9 +22,9 @@ export const UserProvider = ({ children }) => {
   const login = (loginData) => {
     const mongoId = loginData._id || loginData.id;
 
-    // expect loginData to include id, email, name
+    // expect loginData to include id, email andname
     setUser({
-      id: mongoId,       // added id
+      id: mongoId,
       email: loginData.email,
       name: loginData.name
     });

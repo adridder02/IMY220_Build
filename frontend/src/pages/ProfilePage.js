@@ -186,7 +186,7 @@ const ProfilePage = () => {
                 <h2>{firstName} {lastName}</h2>
                 <div className="hLine"></div>
 
-                {/* only show full profile if owner or friend */}
+                {/* only show if owner or friend */}
                 {activeSection === 'Prof' && <ProfileSection userInfo={userInfo} />}
                 {activeSection === 'Actv' && (isOwner || isFriend) && <ActivitySection activities={activities} />}
                 {activeSection === 'Edit' && isOwner && (

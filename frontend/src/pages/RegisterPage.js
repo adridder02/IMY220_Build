@@ -19,7 +19,6 @@ const RegisterPage = () => {
         e.preventDefault();
         setError('');
 
-        // Basic client-side validation
         if (!firstName.trim() || !lastName.trim()) {
             setError('Please enter both first and last name');
             return;
@@ -44,7 +43,6 @@ const RegisterPage = () => {
                 throw new Error(data.error || 'Registration failed');
             }
 
-            // Success: redirect to login
             navigate('/login');
         } catch (err) {
             setError(err.message);

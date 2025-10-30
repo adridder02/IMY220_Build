@@ -36,7 +36,6 @@ const LoginPage = () => {
                 throw new Error(data.error || 'Login failed');
             }
 
-            console.log('Login response:', data.user); // debug
             setUser({
                 id: data.user.id,
                 email: data.user.email,
