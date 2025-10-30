@@ -2,27 +2,35 @@ import React, { useState, useEffect, useContext } from 'react';
 import { UserContext } from '../Session';
 import { AddFiles, Description, ManageMembers, Name, Tags, Type, Version, VersionHistory } from './FormComponents';
 
+const extensionToLanguage = {
+    js: 'javascript', ts: 'typescript', py: 'python', java: 'java',
+    cpp: 'C++', c: 'C', cs: 'csharp', rb: 'ruby', php: 'php',
+    go: 'golang', rs: 'rust', html: 'html', css: 'css', json: 'json', sql: 'sql'
+};
+
+const generateTagsFromFiles = (files) => {
+    const tags = [];
+    files.forEach(f => {
+        const name = typeof f === 'string' ? f : f.name;
+        const ext = name.split('.').pop().toLowerCase();
+        const language = extensionToLanguage[ext];
+        if (language && !tags.includes(language)) tags.push(language);
+    });
+    return tags;
+};
+
 export const CreateProject = ({ onClose, onProjectCreated }) => {
     const { user } = useContext(UserContext);
 
     const [formData, setFormData] = useState({
-        name: '',
-        type: 'Web App',
-        description: '',
-        tags: [],
-        image: '',
-        files: [],
-        version: '0.0.0',
-        members: [user?.email || 'user1@example.com'],
+        name: '', type: 'Web App', description: '', tags: [], image: '', files: [],
+        version: '0.0.0', members: [user?.email || 'user1@example.com']
     });
-
     const [imageFile, setImageFile] = useState(null);
     const [fileObjects, setFileObjects] = useState([]);
     const [error, setError] = useState('');
 
-    const handleInputChange = (field, value) => {
-        setFormData(prev => ({ ...prev, [field]: value }));
-    };
+    const handleInputChange = (field, value) => setFormData(prev => ({ ...prev, [field]: value }));
 
     const handleAddTag = (tag) => {
         if (tag.trim() && !formData.tags.includes(tag)) {
@@ -32,10 +40,13 @@ export const CreateProject = ({ onClose, onProjectCreated }) => {
 
     const handleAddFile = (file) => {
         if (!file) return;
-        setFormData(prev => ({ ...prev, files: [...prev.files, file] }));
-        if (file instanceof File) {
-            setFileObjects(prev => [...prev, file]);
-        }
+        setFormData(prev => {
+            const updatedFiles = [...prev.files, file];
+            const generatedTags = generateTagsFromFiles(updatedFiles);
+            const allTags = Array.from(new Set([...prev.tags, ...generatedTags]));
+            return { ...prev, files: updatedFiles, tags: allTags };
+        });
+        if (file instanceof File) setFileObjects(prev => [...prev, file]);
     };
 
     const uploadImage = async (file) => {
@@ -72,35 +83,22 @@ export const CreateProject = ({ onClose, onProjectCreated }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
-
         if (!formData.name || !formData.description || !formData.version) {
             setError('Name, description, and version are required');
             return;
         }
-
         try {
             const imagePath = await uploadImage(imageFile);
-
-            // separate real files and blank names
             const realFiles = formData.files.filter(f => f instanceof File);
             const blankNames = formData.files.filter(f => typeof f === 'string');
-
             const uploadedFiles = await uploadFiles(realFiles);
-
             const blankFiles = [];
             for (const name of blankNames) {
                 const fileInfo = await createBlankFile(name);
                 blankFiles.push(fileInfo);
             }
-
             const allFiles = [...uploadedFiles, ...blankFiles];
-
-            const projectData = {
-                ...formData,
-                image: imagePath,
-                files: allFiles   // array of { name, path }
-            };
-
+            const projectData = { ...formData, image: imagePath, files: allFiles };
             const res = await fetch('/api/projects', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -108,10 +106,8 @@ export const CreateProject = ({ onClose, onProjectCreated }) => {
             });
             const data = await res.json();
             if (!res.ok) throw new Error(data.error || 'Failed to create project');
-
-            if (onProjectCreated) onProjectCreated(data.project);
+            onProjectCreated?.(data.project);
             onClose();
-
         } catch (err) {
             setError(err.message);
         }
@@ -173,13 +169,11 @@ export const CreateProject = ({ onClose, onProjectCreated }) => {
                             <Description value={formData.description} onChange={(e) => handleInputChange('description', e.target.value)} />
                             <Tags tags={formData.tags} onAddTag={handleAddTag} />
                         </div>
-
                         <div className="rightCol">
                             <AddFiles files={formData.files} onAddFile={handleAddFile} />
                             <Version value={formData.version} onChange={(e) => handleInputChange('version', e.target.value)} />
                         </div>
                     </div>
-
                     <div id="buttonContainer">
                         <button type="submit" className="submit">Confirm</button>
                     </div>
@@ -320,14 +314,8 @@ export const CheckInProject = ({ projectId, userEmail, onCheckIn, onClose }) => 
 export const EditProject = ({ projectId, onClose, onProjectUpdate }) => {
     const { user } = useContext(UserContext);
     const [formData, setFormData] = useState({
-        name: '',
-        type: 'Web App',
-        description: '',
-        tags: [],
-        image: '',
-        files: [],
-        version: '0.0.0',
-        members: [],
+        name: '', type: 'Web App', description: '', tags: [], image: '', files: [],
+        version: '0.0.0', members: []
     });
     const [imageFile, setImageFile] = useState(null);
     const [fileObjects, setFileObjects] = useState([]);
@@ -346,7 +334,7 @@ export const EditProject = ({ projectId, onClose, onProjectUpdate }) => {
                     name: data.name,
                     type: data.type,
                     description: data.description,
-                    tags: data.tags || [],
+                    tags: data.tags || generateTagsFromFiles(files),
                     image: data.image || '',
                     files: files,
                     version: data.version,
@@ -359,6 +347,9 @@ export const EditProject = ({ projectId, onClose, onProjectUpdate }) => {
                         avatar: m.avatar,
                     })),
                 });
+
+                // Keep track of File objects for newly added files
+                setFileObjects([]);
             } catch (error) {
                 console.error('Error:', error);
                 setError(error.message);
@@ -367,9 +358,7 @@ export const EditProject = ({ projectId, onClose, onProjectUpdate }) => {
         fetchProject();
     }, [projectId]);
 
-    const handleInputChange = (field, value) => {
-        setFormData(prev => ({ ...prev, [field]: value }));
-    };
+    const handleInputChange = (field, value) => setFormData(prev => ({ ...prev, [field]: value }));
 
     const handleAddTag = (tag) => {
         if (tag && !formData.tags.includes(tag)) {
@@ -379,16 +368,19 @@ export const EditProject = ({ projectId, onClose, onProjectUpdate }) => {
 
     const handleAddFile = (file) => {
         if (!file) return;
-        setFormData(prev => ({ ...prev, files: [...prev.files, file] }));
-        if (file instanceof File) {
-            setFileObjects(prev => [...prev, file]);
-        }
+        setFormData(prev => {
+            const updatedFiles = [...prev.files, file];
+            const generatedTags = generateTagsFromFiles(updatedFiles);
+            const allTags = Array.from(new Set([...prev.tags, ...generatedTags]));
+            return { ...prev, files: updatedFiles, tags: allTags };
+        });
+        if (file instanceof File) setFileObjects(prev => [...prev, file]);
     };
 
     const handlePromote = (email) => {
-        setFormData((prev) => {
+        setFormData(prev => {
             const members = [...prev.members];
-            const idx = members.findIndex((m) => m.email === email);
+            const idx = members.findIndex(m => m.email === email);
             if (idx === -1 || idx === 0) return prev;
             [members[0], members[idx]] = [members[idx], members[0]];
             return { ...prev, members };
@@ -397,10 +389,7 @@ export const EditProject = ({ projectId, onClose, onProjectUpdate }) => {
 
     const handleRemove = (email) => {
         if (formData.members[0]?.email === email) return;
-        setFormData(prev => ({
-            ...prev,
-            members: prev.members.filter(m => m.email !== email)
-        }));
+        setFormData(prev => ({ ...prev, members: prev.members.filter(m => m.email !== email) }));
     };
 
     const uploadImage = async (file) => {
@@ -437,7 +426,6 @@ export const EditProject = ({ projectId, onClose, onProjectUpdate }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
-
         try {
             const imagePath = await uploadImage(imageFile);
 
@@ -452,12 +440,14 @@ export const EditProject = ({ projectId, onClose, onProjectUpdate }) => {
                 blankFiles.push(fileInfo);
             }
 
-            const allFiles = [...formData.files.filter(f => typeof f !== 'string' && !(f instanceof File)), ...uploadedFiles, ...blankFiles];
+            // Include existing files that are not File objects or strings
+            const existingFiles = formData.files.filter(f => typeof f !== 'string' && !(f instanceof File));
+            const allFiles = [...existingFiles, ...uploadedFiles, ...blankFiles];
 
             const payload = {
                 ...formData,
                 image: imagePath,
-                files: allFiles,   // array of { name, path }
+                files: allFiles,
                 members: formData.members.map(m => m.email),
             };
 
@@ -529,19 +519,15 @@ export const EditProject = ({ projectId, onClose, onProjectUpdate }) => {
                 <form onSubmit={handleSubmit}>
                     <div className="formContent">
                         <div className="leftCol">
-                            <Name value={formData.name} onChange={(e) => handleInputChange('name', e.target.value)} />
-                            <Type value={formData.type} onChange={(e) => handleInputChange('type', e.target.value)} />
-                            <Description value={formData.description} onChange={(e) => handleInputChange('description', e.target.value)} />
+                            <Name value={formData.name} onChange={e => handleInputChange('name', e.target.value)} />
+                            <Type value={formData.type} onChange={e => handleInputChange('type', e.target.value)} />
+                            <Description value={formData.description} onChange={e => handleInputChange('description', e.target.value)} />
                             <Tags tags={formData.tags} onAddTag={handleAddTag} />
                         </div>
                         <div className="rightCol">
                             <AddFiles files={formData.files} onAddFile={handleAddFile} />
-                            <Version value={formData.version} onChange={(e) => handleInputChange('version', e.target.value)} />
-                            <ManageMembers
-                                members={formData.members}
-                                onPromote={handlePromote}
-                                onRemove={handleRemove}
-                            />
+                            <Version value={formData.version} onChange={e => handleInputChange('version', e.target.value)} />
+                            <ManageMembers members={formData.members} onPromote={handlePromote} onRemove={handleRemove} />
                         </div>
                     </div>
                     <div id="buttonContainer">

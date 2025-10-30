@@ -14,6 +14,10 @@ const ProjectViewPage = () => {
     const [error, setError] = useState(null);
 
     useEffect(() => {
+        document.title = 'Build - Projects';
+    }, []);
+
+    useEffect(() => {
         const fetchProject = async () => {
             try {
                 const response = await fetch(`/api/projects/${id}`);
@@ -40,7 +44,6 @@ const ProjectViewPage = () => {
                 const data = await response.json();
                 const activitiesWithId = data.map((a) => ({ ...a, id: a._id?.toString() || a.id }));
                 setActivities(activitiesWithId);
-                // Update project with activities
                 setProject((prev) => ({ ...prev, activities: activitiesWithId }));
             } catch (err) {
                 console.error(err);

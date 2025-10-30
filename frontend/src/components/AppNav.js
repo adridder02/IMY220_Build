@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate, Link } from 'react-router-dom';
 import { UserContext } from '../Session';
 
 const AppNav = () => {
@@ -59,6 +59,9 @@ const AppNav = () => {
 
   return (
     <nav>
+      <Link to="/home">
+        <img src="/assets/img/BuildHome.svg" alt="BuildLogo" />
+      </Link>
       <div>
         <NavLink to="/home" className={({ isActive }) => isActive ? 'active accent' : ''}>Home</NavLink>
         {user && (

@@ -251,7 +251,6 @@ export default function projectRoutes(db) {
   });
 
   // PUT update project
-  // PUT update project – respects member order (first = owner)
   router.put("/:id", async (req, res) => {
     try {
       const id = req.params.id;

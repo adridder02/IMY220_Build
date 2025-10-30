@@ -40,9 +40,18 @@ export default function authRoutes(db) {
     if (existingUser)
       return res.status(400).json({ error: "Email already registered" });
 
+    const avatars = [
+      "/assets/img/avatarPlaceholder1.png",
+      "/assets/img/avatarPlaceholder2.png",
+      "/assets/img/avatarPlaceholder3.png",
+    ];
+
+    //  random avatar
+    const avatar = avatars[Math.floor(Math.random() * avatars.length)];
+
     const newUser = {
       email: email.toLowerCase(),
-      password,                              
+      password,
       firstName,
       lastName,
       organization,
@@ -50,7 +59,7 @@ export default function authRoutes(db) {
       phone,
       dob,
       country,
-      avatar: "/assets/img/placeholder.png",
+      avatar, 
       status: true,
       friends: [],
       friendRequests: [],
@@ -66,6 +75,7 @@ export default function authRoutes(db) {
         { field: "about", value: about, visible: false },
       ],
     };
+
 
     const result = await usersCollection.insertOne(newUser);
 

@@ -150,12 +150,17 @@ body#splash header img {
 
 /*Nav*/
 
+nav img {
+    width: 10vw;
+    margin-right: 5vw;
+}
+
 nav {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     align-content: center;
-    width: 80%;
+    width: 90%;
     margin: 0 auto;
     padding: 3vw 0 1vw;
     color: var(--primary);

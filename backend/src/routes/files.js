@@ -70,7 +70,7 @@ router.post("/projects/create-blank-file", (req, res) => {
     const { name } = req.body;
     if (!name) return res.status(400).json({ error: "Name required" });
 
-    const dir = path.join(__dirname, "../../frontend/public/assets/uploads/files");
+    const dir = path.join(__dirname, "../../../frontend/public/assets/uploads/files");
     if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 
     const ext = path.extname(name) || '.txt';

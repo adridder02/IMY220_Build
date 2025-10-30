@@ -337,6 +337,39 @@ export const Friend = ({ friend, onRemove }) => {
     );
 };
 
+export const FriendRequestButton = ({ profileId }) => {
+    const { user } = useContext(UserContext);
+    const [sent, setSent] = useState(false);
+    const [loading, setLoading] = useState(false);
+
+    const handleSendRequest = async () => {
+        if (!user) return alert("You must be logged in to send a friend request.");
+        setLoading(true);
+        try {
+            const res = await fetch(`/api/users/${profileId}/friend-request`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ senderEmail: user.email }),
+            });
+            if (!res.ok) throw new Error("Failed to send friend request");
+            setSent(true);
+        } catch (err) {
+            console.error(err);
+            alert(err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    if (sent) return <p>Friend request sent!</p>;
+
+    return (
+        <button onClick={handleSendRequest} disabled={loading}>
+            {loading ? "Sending..." : "Send Friend Request"}
+        </button>
+    );
+};
+
 export const ProjectSection = ({ projects = [] }) => {
     return (
         <div className="projectSection">
@@ -346,7 +379,7 @@ export const ProjectSection = ({ projects = [] }) => {
                     <CardMini
                         key={proj._id || proj.id}
                         project={proj}
-                        image={proj.image || '/assets/img/placeholder.png'}   
+                        image={proj.image || '/assets/img/placeholder.png'}
                     />
                 ))}
             </div>

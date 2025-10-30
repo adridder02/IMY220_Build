@@ -16,6 +16,10 @@ const HomePage = () => {
     const [projects, setProjects] = useState([]);
 
     useEffect(() => {
+        document.title = 'Build - Home';
+    }, []);
+
+    useEffect(() => {
         const fetchData = async () => {
             if (!user) return;
 
@@ -110,7 +114,7 @@ const HomePage = () => {
                         </button>
                         {projects.map((project) => (
                             <button
-                                key={project.id}
+                                key={project._id}
                                 className={projectFilter === project.name ? 'selected' : ''}
                                 onClick={() => setProjectFilter(projectFilter === project.name ? '' : project.name)}
                             >

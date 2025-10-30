@@ -77,13 +77,21 @@ export const Tags = ({ tags, onAddTag }) => {
 
 export const AddFiles = ({ files, onAddFile }) => {
     const [fileInput, setFileInput] = React.useState('');
+    const fileInputRef = React.useRef();
 
-    const handleAdd = () => {
+    const handleAddTextFile = () => {
         if (fileInput.trim()) {
             onAddFile(fileInput.trim());
             setFileInput('');
         }
     };
+
+    const handleFile = (file) => {
+        if (!file) return;
+        onAddFile(file);
+    };
+
+    const stop = e => { e.preventDefault(); e.stopPropagation(); };
 
     return (
         <div>
@@ -96,19 +104,28 @@ export const AddFiles = ({ files, onAddFile }) => {
                         value={fileInput}
                         onChange={(e) => setFileInput(e.target.value)}
                     />
-                    <button type="button" onClick={handleAdd}>+</button>
+                    <button type="button" onClick={handleAddTextFile}>+</button>
                 </div>
 
-                <div className="uploadButton">
+                <div
+                    className="uploadButton"
+                    onClick={() => fileInputRef.current.click()}
+                    onDragOver={e => { stop(e); e.currentTarget.classList.add('drag'); }}
+                    onDragLeave={e => { stop(e); e.currentTarget.classList.remove('drag'); }}
+                    onDrop={e => {
+                        stop(e);
+                        e.currentTarget.classList.remove('drag');
+                        const file = e.dataTransfer.files[0];
+                        handleFile(file);
+                    }}
+                >
                     <label>
                         Upload File
                         <input
+                            ref={fileInputRef}
                             type="file"
                             style={{ display: 'none' }}
-                            onChange={(e) => {
-                                const file = e.target.files[0];
-                                if (file) onAddFile(file);
-                            }}
+                            onChange={e => e.target.files[0] && handleFile(e.target.files[0])}
                         />
                     </label>
                     <img src="/assets/img/placeholder.png" alt="UploadFile Symbol" />

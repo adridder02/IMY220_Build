@@ -12,22 +12,25 @@ const ProjectsPage = () => {
   const [sort, setSort] = useState('name-asc');
 
   useEffect(() => {
-    const fetchProjects = async () => {
-      if (!user) return;
-      const params = new URLSearchParams({ scope, sort });
-      if (scope === 'my') params.append('email', user.email);
-      const response = await fetch(`/api/projects?${params}`);
-      const data = await response.json();
-      setProjects(data);
-    };
+    document.title = 'Build - Projects';
+  }, []);
+
+  const fetchProjects = async () => {
+    if (!user) return;
+    const params = new URLSearchParams({ scope, sort });
+    if (scope === 'my') params.append('email', user.email);
+    const response = await fetch(`/api/projects?${params}`);
+    const data = await response.json();
+    setProjects(data);
+  };
+
+  useEffect(() => {
     fetchProjects();
   }, [scope, sort, user]);
 
   const handleDeleteProject = async (projectId) => {
     try {
-      const response = await fetch(`/api/projects/${projectId}`, {
-        method: 'DELETE',
-      });
+      const response = await fetch(`/api/projects/${projectId}`, { method: 'DELETE' });
       if (!response.ok) {
         const data = await response.json();
         console.error('Delete failed:', data.error);
@@ -44,7 +47,13 @@ const ProjectsPage = () => {
   return (
     <>
       {showPopup ? (
-        <CreateProject onClose={() => setShowPopup(false)} />
+        <CreateProject
+          onClose={() => setShowPopup(false)}
+          onProjectCreated={(newProject) => {
+            setProjects(prev => [newProject, ...prev]);
+            setShowPopup(false);
+          }}
+        />
       ) : (
         <div className="projects">
           <div className="projectsBar">
@@ -75,6 +84,5 @@ const ProjectsPage = () => {
     </>
   );
 };
-
 
 export default ProjectsPage;

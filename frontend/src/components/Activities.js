@@ -8,7 +8,7 @@ const fetchAvatar = async (userId) => {
   // check cache first
   if (avatarCache.has(userId)) return avatarCache.get(userId);
 
-  // check local
+  // check localStorage
   const cached = localStorage.getItem(`avatar_${userId}`);
   if (cached) {
     const { url, timestamp } = JSON.parse(cached);
@@ -20,16 +20,24 @@ const fetchAvatar = async (userId) => {
   }
 
   // fetch from server
-  let url;
+  let url = "/assets/img/placeholder.png"; 
   try {
+    let res, data;
+
     if (userId.includes('@')) {
-      const res = await fetch(`/api/users/user?email=${encodeURIComponent(userId)}`);
-      const data = await res.json();
-      url = data.avatar || "/assets/img/placeholder.png";
+      res = await fetch(`/api/users/user?email=${encodeURIComponent(userId)}`);
     } else {
-      const res = await fetch(`/api/users/${userId}`);
-      const data = await res.json();
-      url = data.avatar || "/assets/img/placeholder.png";
+      res = await fetch(`/api/users/${userId}`);
+    }
+
+    if (res.ok) {
+      data = await res.json();
+      url = data.avatar || url;
+    } else if (res.status === 404) {
+      // user deleted, keep fallback
+      console.warn(`User not found: ${userId}`);
+    } else {
+      throw new Error(`Failed to fetch avatar: ${res.status}`);
     }
 
     // cache in memory + localStorage
@@ -42,11 +50,11 @@ const fetchAvatar = async (userId) => {
     return url;
   } catch (err) {
     console.error("Avatar fetch failed:", err);
-    const fallback = "/assets/img/placeholder.png";
-    avatarCache.set(userId, fallback);
-    return fallback;
+    avatarCache.set(userId, url);
+    return url;
   }
 };
+
 
 export const ActivityType1 = ({ avatarUrl, user, action, projectName, timestamp }) => {
   return (

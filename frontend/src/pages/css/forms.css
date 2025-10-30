@@ -151,6 +151,16 @@ div.checkInForm #buttonContainer {
 
 /*Upload Image*/
 
+.uploadButton {
+    cursor: pointer;
+    display: inline-block;
+}
+
+.uploadButton.drag {
+    outline: 3px dashed var(--tertiary);
+    outline-offset: -3px;
+}
+
 .uploadArea {
     width: 80%;
     min-height: 18vw;

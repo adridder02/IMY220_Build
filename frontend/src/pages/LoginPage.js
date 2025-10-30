@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { UserContext } from '../Session';
 
@@ -7,6 +7,10 @@ const LoginPage = () => {
     const [formData, setFormData] = useState({ email: '', password: '' });
     const [error, setError] = useState('');
     const navigate = useNavigate();
+
+    useEffect(() => {
+        document.title = 'Build - Login';
+    }, []);
 
     // if already logged in
     if (user) {

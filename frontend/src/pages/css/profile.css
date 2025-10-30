@@ -257,6 +257,12 @@ div.editGroup {
     width: 90%;
     padding: 1vw;
     row-gap: 1vw;
+    overflow-x: auto;
+    max-height: 40vw;
+}
+
+.projectList::-webkit-scrollbar {
+    height: 8px;
 }
 
 div#projSectLine.hLine {

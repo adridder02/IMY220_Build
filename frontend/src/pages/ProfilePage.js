@@ -7,8 +7,8 @@ import {
     FriendsSection,
     ProfileSection,
     ProjectSection,
-    WordCloud,
-    AvatarUpload
+    AvatarUpload,
+    FriendRequestButton
 } from '../components/ProfileComponents';
 import './css/profile.css';
 
@@ -16,7 +16,7 @@ const ProfilePage = () => {
     const { user, loading, logout } = useContext(UserContext);
     const { id } = useParams();
     const [activeSection, setActiveSection] = useState('Prof');
-    const [activeSectionSide, setActiveSectionSide] = useState('Proj');
+    const [activeSectionSide, setActiveSectionSide] = useState('Frie');
     const [profileLoading, setProfileLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -27,6 +27,11 @@ const ProfilePage = () => {
 
     const isOwner = user?.id === id;
     const [avatarUrl, setAvatarUrl] = useState("/assets/img/placeholder.png");
+    const isFriend = friends.some(f => f.id === user.id);
+
+    useEffect(() => {
+        document.title = 'Build - Profile';
+    }, []);
 
     // fetch user profile
     useEffect(() => {
@@ -173,26 +178,19 @@ const ProfilePage = () => {
                 )}
 
                 {isOwner ? (
-                    <AvatarUpload
-                        currentAvatar={avatarUrl}
-                        userId={user.id}
-                        onAvatarChange={setAvatarUrl}
-                    />
+                    <AvatarUpload currentAvatar={avatarUrl} userId={user.id} onAvatarChange={setAvatarUrl} />
                 ) : (
                     <img src={avatarUrl} alt="pfp" className="pfp" />
                 )}
+
                 <h2>{firstName} {lastName}</h2>
                 <div className="hLine"></div>
 
+                {/* only show full profile if owner or friend */}
                 {activeSection === 'Prof' && <ProfileSection userInfo={userInfo} />}
-                {activeSection === 'Actv' && <ActivitySection activities={activities} />}
-                {activeSection === 'Clou' && <WordCloud />}
+                {activeSection === 'Actv' && (isOwner || isFriend) && <ActivitySection activities={activities} />}
                 {activeSection === 'Edit' && isOwner && (
-                    <EditProfile
-                        userInfo={userInfo}
-                        setUserInfo={setUserInfo}
-                        onDelete={handleDeleteProfile}
-                    />
+                    <EditProfile userInfo={userInfo} setUserInfo={setUserInfo} onDelete={handleDeleteProfile} />
                 )}
             </div>
 
@@ -200,35 +198,39 @@ const ProfilePage = () => {
                 <button
                     className={activeSection === 'Prof' ? 'active' : ''}
                     onClick={() => handleButtonClick('Prof')}
-                >Prof</button>
-                <button
-                    className={activeSection === 'Actv' ? 'active' : ''}
-                    onClick={() => handleButtonClick('Actv')}
-                >Actv</button>
-                <button
-                    className={activeSection === 'Clou' ? 'active' : ''}
-                    onClick={() => handleButtonClick('Clou')}
-                >Clou</button>
+                >
+                    Prof
+                </button>
+
+                {/*  only for owner or friends */}
+                {(isOwner || isFriend) && (
+                    <>
+                        <button
+                            className={activeSection === 'Actv' ? 'active' : ''}
+                            onClick={() => handleButtonClick('Actv')}
+                        >
+                            Actv
+                        </button>
+                        <button
+                            className={activeSectionSide === 'Proj' ? 'active' : ''}
+                            onClick={() => handleButtonClickSide('Proj')}
+                        >Proj</button>
+                    </>
+                )}
                 <button
                     className={activeSectionSide === 'Frie' ? 'active' : ''}
                     onClick={() => handleButtonClickSide('Frie')}
-                >Frie</button>
-                <button
-                    className={activeSectionSide === 'Proj' ? 'active' : ''}
-                    onClick={() => handleButtonClickSide('Proj')}
-                >Proj</button>
+                >Frie
+                </button>
             </div>
 
             <div className="sideCol">
                 {activeSectionSide === 'Frie' && (
-                    <FriendsSection
-                        friends={friends}
-                        setFriends={setFriends}
-                        profileId={id}
-                        currentUserId={user.id}
-                    />
+                    isOwner || isFriend
+                        ? <FriendsSection friends={friends} setFriends={setFriends} profileId={id} currentUserId={user.id} />
+                        : <FriendRequestButton profileId={id} />
                 )}
-                {activeSectionSide === 'Proj' && <ProjectSection projects={projects} />}
+                {activeSectionSide === 'Proj' && (isOwner || isFriend) && <ProjectSection projects={projects} />}
             </div>
         </div>
     );
